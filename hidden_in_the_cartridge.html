@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - Hidden in the Cartridge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command::before{
+            content:"$ ";
+        }
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .error-output {
+            background-color: #2a1515;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #cc4444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ffaaaa;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .language-mapping {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>👾 Challenge: Hidden in the Cartridge</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: Forensics</div>
+            <div>💯 Points: 100</div>
+            <div>📈 Solves: 84</div>
+            <div>👤 Author: AAntioch</div>
+            <div>👤 Solver: _mx_05 / CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>During a test session on the Retro-Arcade emulator, I found a corrupted copy of the classic <em>Space Invaders</em>. The game won't start, but the memory logs remain in the ROM file. Rumor has it that the developers used to leave hidden messages in the test cartridges. Can you help me fix this copy?</p>
+        </div>
+        <p>📦 <strong>Files Provided:</strong> Hidden_in_the_Cartridge.7z (Modified NES ROM for Nestopia)</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Exploration</h2>
+        <p>Extracting the archive revealed a modified NES ROM. The game refused to boot in the emulator, but the ROM was readable, hinting at a forensic approach rather than gameplay exploitation.</p>
+        <div class="key-point">
+            <p>🕵️ <strong>First Observations:</strong></p>
+            <ul>
+                <li>📝 ROM contains debug strings and metadata</li>
+                <li>🧩 Emulator used: Nestopia</li>
+                <li>🛠️ Tools considered: <code>strings</code>, <code>nesgodisasm</code>, hex editors</li>
+                <li>❓ No immediate gameplay path; focus on file analysis</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Investigation & Analysis</h2>
+        <div class="step">
+            <h3>🔎 Step 1: String Analysis</h3>
+            <p>Running <code>strings</code> on the ROM surfaced several debug messages, including a comment about a "secret cheat code." Inputting the code in the emulator had no effect.</p>
+            <div class="command">
+                strings Hidden_in_the_Cartridge.nes | grep -n1 Secret
+            </div>
+            <div class="output">
+                233-y.$U#<br>
+                234:[1987-06-15 10:32:16] DEBUG  - Secret cheat code: <br>
+                235- B A
+            </div>
+        </div>
+1        <div class="step">
+            <h3>🧵 Step 2: Disassembly</h3>
+            <p>Using <code>nesgodisasm</code> to decompile the ROM produced readable assembly, but no clear exploit path. The debug strings remained the most promising lead.</p>
+            <div class="command">
+                ./nesgodisasm -binary ./space_invaders.nes
+            </div>
+            <div class="output">
+[------------------------------------] <br>
+[ nesgodisasm - NES ROM disassembler ]<br>
+[------------------------------------]<br>
+<br>
+2025-09-18 11:32:06  INFO    Build info {"version":"0.2.3 commit: e32f0b55332755e718ffc8e699d3805c8e7b4d4c built at: 2024-11-05T16:27:28Z built with: go1.22.8"}<br>
+2025-09-18 11:32:06  INFO    Processing ROM {"file":"./space_invaders.nes","mapper":0,"assembler":"ca65"}
+           </div>
+        </div>
+        <div class="step">
+            <h3>💡 Step 3: Hexadecimal Clues</h3>
+            <p>Returning to the string dump, I noticed a block of ASCII characters encoded in hexadecimal, delimited by <code>$</code> symbols. This looked promising.</p>
+            <p>🧪 <strong>Decoding Process</strong>:</p>
+            <ul>
+                <li>Removed all <code>$</code> delimiters</li>
+                <li>Converted hex to ASCII</li>
+                <li>Revealed a hidden message: the flag!</li>
+            </ul>
+
+            <pre class="command">
+printf "%s\n" "$(strings space_invaders.nes |
+        grep -E -o '([0-9 a-f]{2}\${3})+[0-9 a-f]{2}' |
+        tr -d '$' |
+        xxd -r -p)"
+            </pre>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🏁 Step 4: Flag Capture</h2>
+        <p>Decoding the hex block revealed the flag embedded in the ROM:</p>
+        <div class="flag">
+            🚩 ctf{9f1b438164dbc8a6249ba5c66fc0d6195b5388beed890680bf616021f2582248}
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 Technical Insights</h2>
+        <h3>About the ROM</h3>
+        <ul>
+            <li>🕹️ Modified NES ROM with embedded debug info</li>
+            <li>🧩 Hidden data encoded in hex within string section</li>
+            <li>🧪 No need for full reverse engineering—string analysis was key</li>
+        </ul>
+        <h3>Tools Used</h3>
+        <ul>
+            <li><code>strings</code> for initial inspection</li>
+            <li><code>nesgodisasm</code> for disassembly</li>
+            <li>Hex editor for manual decoding</li>
+        </ul>
+        <h3>Challenge Behavior</h3>
+        <ul>
+            <li>Game logic disabled; flag hidden in ROM metadata</li>
+            <li>Debug messages as breadcrumbs to the solution</li>
+            <li>Hex encoding used to obfuscate the flag</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔍 <strong>Strings First:</strong> Always inspect strings for low-hanging fruit</li>
+            <li>🧪 <strong>Test and Iterate:</strong> Disassemblers can help, even if not directly</li>
+            <li>💡 <strong>Encoded Data:</strong> Flags often hide in plain sight, just obfuscated</li>
+            <li>🕹️ <strong>Emulators:</strong> Useful for both analysis and fun</li>
+            <li>🧵 <strong>Debug Messages:</strong> Can be breadcrumbs to the flag</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔗 References</h2>
+        <div class="references">
+            <p><strong>Nestopia Emulator:</strong> <a href="https://nestopia.sourceforge.net/">https://nestopia.sourceforge.net/</a></p>
+            <p><strong>nesgodisasm:</strong> <a href="https://github.com/bbbradsmith/nesgodisasm">https://github.com/bbbradsmith/nesgodisasm</a></p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 – Writeup created by _mx_05 / CuboConNoveQuadrati | Happy hacking! 👾</p>
+    </div>
+</body>
+</html>
