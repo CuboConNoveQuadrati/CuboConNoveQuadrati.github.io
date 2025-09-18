@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - holiday_trip</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .step {
+            margin-bottom: 30px;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎯 Challenge: parting_ways</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>📢 Category: Osint</div>
+            <div>💯 Points: 162</div>
+            <div>📊 Solves: 24</div>
+            <div>👤 Author: iseline27424</div>
+            <div>👤 Solver: ArghgrA/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>In the ancient kingdom of the Teutons there was a fortress with 71 noble houses. And hidden beneath one of these houses were two brothers. These two brothers, quarreling over the inheritance of their parents’ wealth, each chose to go out into the world to seek their fate. But, wishing to remember the place from which each had departed, they decided to divide into three branches. Now the three branches form a bridge of passage between the inhabitants of the fortress. Where did the two brothers part ways? Flag format: CTF{town_name} (case insensitive and ascii characters only)</p>
+        </div>
+        <p><strong>📁 Files:</strong> HOLIDAY_TRIP.jpg</p>
+        <p><strong>🔗 Link:</strong> <a href="https://ctf.ac.upt.ro/challenges#parting_ways-39">https://ctf.ac.upt.ro/challenges#parting_ways-39</a></p>
+    </div>
+    <div class="container">
+        <h2>🔍 Initial Reconnaissance</h2>
+        <p>The challenge provides an image file named <code>IMAGE.jpg</code>. The goal is to identify the beach where the mug was purchased by analyzing the image.</p>
+        <div class="key-point">
+            <p>⚠️ The image likely contains visual clues (landmarks, signs, landscape) that can be used for geolocation.</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+        <div class="step">
+            <h3>🔑 Step 1: Reverse Image Search</h3>
+            <p>The first phase of the investigation was to verify the origin of the photograph through a <strong>reverse image search</strong> on Yandex Images. This approach is logical for OSINT challenges.</p>
+            <div class="command">
+                Yandex Images Search: uploading IMAGE.jpg
+            </div>
+            <p>After various attempts, I managed to find an identical or very similar shot.</p>
+            <div class="key-point">
+                <p>🔍 Yandex Images often provides better results than Google Images for this type of reverse searches.</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>🎯 Step 2: Source Identification</h3>
+            <p>From there I followed the link that leads to the site where the image is hosted, namely <strong>Wikimedia Commons</strong>:</p>
+            <div class="output">
+                File found: Kolwnweltenburgview.jpg on Wikimedia Commons
+            </div>
+            <p>The name of the file itself – <em>Kolwnweltenburgview.jpg</em> – provides an important first clue: it refers to <strong>Weltenburg</strong>, a locality known for its Benedictine monastery located along the Danube.</p>
+            <div class="highlight-section">
+                <p>💡 <strong>Key Insight:</strong> The filename "Kolwnweltenburgview.jpg" contains explicit geographical references that guide towards the location of Weltenburg in Germany.</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>🌍 Step 3: Geographic Verification with Google Earth</h3>
+            <p>At this point I deepened the research using <strong>Google Earth</strong>, to compare the landscape visible in the image with the real geography of the area.</p>
+            <div class="command">
+                Google Earth: search "Weltenburg Germany" + surrounding landscape analysis
+            </div>
+            <p>The analysis allowed me to precisely identify the position, located near the hamlet of <strong>Stausacker (Kelheim, Germany)</strong>.</p>
+            <div class="output">
+                Identified coordinates: 48.89361236, 11.82098711
+                Location: Stausacker, hamlet of Kelheim, Bavaria, Germany
+            </div>
+            <p>Reference links used for verification:</p>
+            <ul>
+                <li><strong>👉 Yandex search result:</strong> <a href="#" target="_blank">Yandex Image Search Result</a></li>
+                <li><strong>👉 Original file on Wikimedia:</strong> <a href="https://commons.m.wikimedia.org/wiki/File:Kolwnweltenburgview.jpg" target="_blank">Kolwnweltenburgview.jpg</a></li>
+                <li><strong>👉 Position on Google Earth:</strong> <a href="https://earth.google.com/web/search/Kelheim-Stausacker,+Germany" target="_blank">Kelheim-Stausacker, Germany</a></li>
+            </ul>
+        </div>
+        <div class="step">
+            <h3>🚩 Step 4: Flag Extraction</h3>
+            <p>Having identified the location as Stausacker in Kelheim, Germany, the name of the "beach" (or more accurately, the specific area/landmark) is "Stausacker". According to the flag format, we submit the name of the location.</p>
+            <div class="flag">
+                CTF{Stausacker}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>📚 Lessons Learned</h2>
+        <ul>
+            <li>Reverse image search (especially Yandex) is a powerful tool for OSINT challenges involving images.</li>
+            <li>File names often contain valuable geographical clues that can accelerate the identification process.</li>
+            <li>Google Earth is invaluable for verifying and precisely locating geographical features identified through other means.</li>
+            <li>The combination of multiple sources (Yandex Images, Wikimedia Commons, Google Earth) significantly increases identification accuracy.</li>
+        </ul>
+    </div>
+    <div class="container references">
+        <h2>🔗 References</h2>
+        <ul>
+            <li><a href="https://yandex.com/images/">Yandex Images Reverse Search</a></li>
+            <li><a href="https://commons.wikimedia.org/">Wikimedia Commons</a></li>
+            <li><a href="https://earth.google.com/">Google Earth</a></li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by ArghgrA/CuboConNoveQuadrati | Happy hacking! 🔍</p>
+    </div>
+</body>
+</html>

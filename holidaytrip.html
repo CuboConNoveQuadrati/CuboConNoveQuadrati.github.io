@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - holiday_trip</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .step {
+            margin-bottom: 30px;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎯 Challenge: holiday_trip</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>📢 Category: Osint</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 67</div>
+            <div>👤 Author: iseline27424</div>
+            <div>👤 Solver: ArghgrA/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>My brother went to the beach last week. He knows I collect novelty mugs so he picked one up for me - but, as always, he couldn’t resist turning it into a challenge.
+
+So he sent me a photo saying, “Picked one up for you and left it at the our parents house. Father will keep it hidden until you can tell him where I bought it.”
+
+Your mission: help me find the beach where my brother bought the mug in order to get it from my father.
+
+Flag format: CTF{the_name_of_the_beach} (case insensitive and ascii characters only in either english,romanian or the native country's language )</p>
+        </div>
+        <p><strong>📁 Files:</strong> HOLIDAY_TRIP.jpg</p>
+        <p><strong>🔗 Link:</strong> <a href="https://ctf.ac.upt.ro/challenges#holiday_trip-44">https://ctf.ac.upt.ro/challenges#holiday_trip-44</a></p>
+    </div>
+    <div class="container">
+        <h2>🔍 Initial Reconnaissance</h2>
+        <p>The challenge provides an image file named <code>HOLIDAY_TRIP.jpg</code>. The goal is to identify the beach where the mug was purchased by analyzing the image.</p>
+        <div class="key-point">
+            <p>⚠️ The image likely contains visual clues (landmarks, signs, landscape) that can be used for geolocation.</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+        <div class="step">
+            <h3>🔑 Step 1: Google Lens Investigation</h3>
+            <p>The first phase of the investigation was conducted using <strong>Google Lens</strong>, with the purpose of identifying the possible origin of the photograph depicting mugs.</p>
+            <div class="command">
+                Google Lens: uploading HOLIDAY_TRIP.jpg for visual recognition
+            </div>
+            <p>Accessing the <strong>related images</strong> section, I found an identical photo that led to a specific website.</p>
+            <div class="key-point">
+                <p>🔍 Google Lens proved to be highly effective in finding exact matches and related visual content for this challenge.</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>🎯 Step 2: Source Identification and Article Analysis</h3>
+            <p>The identical image led me to an article on Canal33.ro:</p>
+            <div class="output">
+                Source found: Canal33.ro article containing the exact same photograph
+            </div>
+            <p><strong>👉 Article reference:</strong> <a href="https://canal33.ro/15-lei-bucata-canile-cu-george-simion-nicusor-dan-calin-georgescu-si-ceausescu-se-vand-ca-painea-calda-in-statiunile-din-bulgaria/" target="_blank">Canal33.ro Article</a></p>
+            <p>Exploring the article content, I noticed that the location of the shot was clearly specified: the <strong>Bulgarian tourist resort of Golden Sands</strong>.</p>
+            <div class="highlight-section">
+                <p>💡 <strong>Key Discovery:</strong> The article explicitly mentions "Golden Sands" as the location where the photograph was taken, providing direct confirmation of the beach location.</p>
+            </div>
+        </div>
+        <div class="step">
+            <h3>🚩 Step 3: Flag Extraction</h3>
+            <p>Thanks to the analysis with Google Lens and verification through the found source, it was possible to identify the exact position where the photograph was taken.</p>
+            <div class="output">
+                📍 Location identified: Golden Sands, Bulgaria
+                🏖️ Tourist resort known for its beautiful beaches and souvenir shops
+            </div>
+            <p>According to the flag format requirements, the beach name is submitted as follows:</p>
+            <div class="flag">
+                CTF{Golden_Sands}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>📚 Lessons Learned</h2>
+        <ul>
+            <li>Google Lens can be extremely effective for OSINT challenges involving visual recognition and object identification.</li>
+            <li>Related images feature in Google Lens often provides direct links to source articles or websites.</li>
+            <li>News articles and travel websites frequently contain explicit location information that can solve geolocation challenges.</li>
+            <li>Cross-referencing visual search results with textual content increases the reliability of location identification.</li>
+        </ul>
+    </div>
+    <div class="container references">
+        <h2>🔗 References</h2>
+        <ul>
+            <li><a href="https://lens.google.com/">Google Lens</a></li>
+            <li><a href="https://canal33.ro/15-lei-bucata-canile-cu-george-simion-nicusor-dan-calin-georgescu-si-ceausescu-se-vand-ca-painea-calda-in-statiunile-din-bulgaria/">Canal33.ro Article</a></li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by ArghgrA/CuboConNoveQuadrati | Happy hacking! 🔍</p>
+    </div>
+</body>
+</html>
