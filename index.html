@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuboConNoveQuadrati CTF Challenges Writeups Collection</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border-left: 6px solid #0d7377;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 15px 0;
+            font-size: 3em;
+            color: #0d7377;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #14ffec;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background-color: #222;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .writeups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .writeup-card {
+            background: linear-gradient(135deg, #222 0%, #2a2a2a 100%);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .writeup-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(13, 115, 119, 0.1) 0%, rgba(20, 255, 236, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .writeup-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border-left-color: #14ffec;
+        }
+
+        .writeup-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .challenge-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+
+        .challenge-title {
+            flex-grow: 1;
+        }
+
+        .challenge-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #14ffec;
+            margin: 0 0 5px 0;
+        }
+
+        .challenge-category {
+            font-size: 0.9em;
+            color: #0d7377;
+            margin: 0;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .challenge-description {
+            color: #ccc;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .challenge-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .tech-tag {
+            background-color: #2a2a2a;
+            color: #14ffec;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            border: 1px solid #14ffec;
+            opacity: 0.8;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #777;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            color: #14ffec;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .filter-dropdown {
+            background-color: #333;
+            color: #e0e0e0;
+            border: 2px solid #0d7377;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-dropdown:hover {
+            border-color: #14ffec;
+            background-color: #404040;
+        }
+
+        .filter-dropdown:focus {
+            outline: none;
+            border-color: #14ffec;
+            box-shadow: 0 0 0 2px rgba(20, 255, 236, 0.2);
+        }
+
+        .clear-btn {
+            background-color: #444;
+            color: #e0e0e0;
+            border: 2px solid #666;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background-color: #ff6b35;
+            border-color: #ff6b35;
+            color: white;
+        }
+
+        .category-web { border-left-color: #3498db; }
+        .category-pwn { border-left-color: #e74c3c; }
+        .category-reverse { border-left-color: #2ecc71; }
+        .category-forensic { border-left-color: #ff6b35; }
+        .category-crypto { border-left-color: #f7931e; }
+        .category-misc { border-left-color: #9b59b6; }
+
+        .category-web:hover { border-left-color: #5dade2; }
+        .category-pwn:hover { border-left-color: #f1948a; }
+        .category-reverse:hover { border-left-color: #58d68d; }
+        .category-forensic:hover { border-left-color: #ff8c63; }
+        .category-crypto:hover { border-left-color: #f9b16e; }
+        .category-misc:hover { border-left-color: #b284d1; }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1000px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #14ffec;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            color: #ff6b6b;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .writeup-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #1a1a1a;
+        }
+
+        .iframe-error {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ff6b6b;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .iframe-error-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .writeups-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2.2em;
+            }
+            
+            .stats {
+                gap: 15px;
+            }
+
+            .modal-content {
+                width: 95%;
+                height: 90vh;
+            }
+
+            #modal-url {
+                display: none;
+            }
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🏆 CTF Writeups Collection</h1>
+        <p class="subtitle">Challenge Solutions by CuboConNoveQuadrati</p>
+        <div class="stats">
+            <div class="stat-item" id="total-challenges">📊 <i id="total-challenges-number"></i> Challenges Solved</div>
+            <div class="stat-item" id="total-ctfs">🎪 <i id="total-ctfs-number"></i> CTFs Covered</div>
+            <div class="stat-item" id="total-categories">🎯 <i id="total-categories-number"></i> Categories Covered</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>🔍 Filter Writeups</h2>
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="ctf-filter">🎪 CTF Event:</label>
+                <select id="ctf-filter" class="filter-dropdown">
+                    <option value="all">All CTFs</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="category-filter">🎯 Category:</label>
+                <select id="category-filter" class="filter-dropdown">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    let all_challenges = document.getElementsByClassName("writeups-grid")[0];
+                    
+                    let categories = [];
+                    let ctfs = [];
+                    for(ch of all_challenges.children){
+                        let cat = ch.getAttribute("data-category");
+                        let ctf = ch.getAttribute("data-ctf");
+                        if(categories.indexOf(cat)==-1){
+                            categories.push(cat);
+                        }
+                        if(ctfs.indexOf(ctf)==-1){
+                            ctfs.push(ctf);
+                        }
+                    }
+                    let category_filter = document.getElementById("category-filter");
+                    categories.forEach(cat => {
+                        let opt = document.createElement("option");
+                        opt.value = cat;
+                        opt.innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
+                        category_filter.appendChild(opt);
+                    });
+                    let ctf_filter = document.getElementById("ctf-filter");
+                    ctfs.forEach(ctf => {
+                        let opt = document.createElement("option");
+                        opt.value = ctf;
+                        opt.innerText = ctf;
+                        ctf_filter.appendChild(opt);
+                    });
+                });
+            </script>
+            
+            <button id="clear-filters" class="clear-btn">🗑️ Clear Filters</button>
+        </div>
+    </div>
+
+    <div class="writeups-grid">
+        <div class="writeup-card category-forensic" data-ctf="CTF@AC" data-category="forensic" data-writeup="unknowntraffic1.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🕵️</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">unknown-traffic1</h3>
+                    <p class="challenge-category">Forensic • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"Can you find the hidden message in this pcap file?"</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Wireshark</span>
+                    <span class="tech-tag">ICMP</span>
+                    <span class="tech-tag">Base64</span>
+                    <span class="tech-tag">Scapy</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-forensic" data-ctf="CTF@AC" data-category="forensic" data-writeup="unknowntraffic2.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🔍</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">unknown-traffic2</h3>
+                    <p class="challenge-category">Forensic • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"A lot more traffic just showed up on the network. Can you figure out what it is?"</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">PCAP Analysis</span>
+                    <span class="tech-tag">QR Code</span>
+                    <span class="tech-tag">OpenCV</span>
+                    <span class="tech-tag">Image Processing</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-crypto" data-ctf="CTF@AC" data-category="crypto" data-writeup="repeatedrsa.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🔐</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Repeated RSA</h3>
+                    <p class="challenge-category">Crypto • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"We've been told that multiple RSA encryptions can strengthen the security. Not sure if it's alright though..."</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">RSA</span>
+                    <span class="tech-tag">GCD</span>
+                    <span class="tech-tag">Prime Factorization</span>
+                    <span class="tech-tag">Cryptanalysis</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-misc" data-ctf="CTF@AC" data-category="misc" data-writeup="escapingbarcelona.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🚀</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Escaping Barcelona</h3>
+                    <p class="challenge-category">Misc • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"We must leave this planet at exactly 18:00 UTC+2 on 7th of November 2025. Leaving from Barcelona so act quick and give me the distance to Mars."</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Astronomy</span>
+                    <span class="tech-tag">PyEphem</span>
+                    <span class="tech-tag">Orbital Mechanics</span>
+                    <span class="tech-tag">Python</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-misc" data-ctf="CTF@AC" data-category="misc" data-writeup="rugina.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🦀</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">rugina</h3>
+                    <p class="challenge-category">Misc • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"Aren't you tired of rust? I found the perfect solution for you! Welcome to Rugină. Since there is no compiler for it yet, I made one for you."</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Rust</span>
+                    <span class="tech-tag">Romanian</span>
+                    <span class="tech-tag">Language Localization</span>
+                    <span class="tech-tag">System Commands</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-misc" data-ctf="CTF@AC" data-category="misc" data-writeup="discodance.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">💿</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Disco Dance</h3>
+                    <p class="challenge-category">Misc • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"I heard disco parties can be pretty random and chaotic. Let's see just how chaotic."</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Discord</span>
+                    <span class="tech-tag">Seed</span>
+                    <span class="tech-tag">SHA256</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-misc" data-ctf="CTF@AC" data-category="misc" data-writeup="discorave.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🪩</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Disco Rave</h3>
+                    <p class="challenge-category">Misc • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"This is so infuriating! I know exactly what to do , but those damn trolls won't let me ! This feels like that prisoner's dilema I heard about."</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Spam</span>
+                    <span class="tech-tag">Discord</span>
+                    <span class="tech-tag">API</span>
+                    <span class="tech-tag">Seed</span>
+                    <span class="tech-tag">SHA256</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="writeup-card category-misc" data-ctf="CTF@AC" data-category="misc" data-writeup="onion1.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🧅</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Onion1</h3>
+                    <p class="challenge-category">Misc • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"I hope this won't make me cry!"</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Tor</span>
+                    <span class="tech-tag">Webpage</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-web" data-ctf="CTF@AC" data-category="web" data-writeup="randomgallery.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🖼️</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Random Gallery</h3>
+                    <p class="challenge-category">Web • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"just some photos?"</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Cookie</span>
+                    <span class="tech-tag">QR Code</span>
+                    <span class="tech-tag">Web Scraping</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-web" data-ctf="CTF@AC" data-category="web" data-writeup="lolchat.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">🥳</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">lolchat</h3>
+                    <p class="challenge-category">Web • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"lol"</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Socket.io</span>
+                    <span class="tech-tag">Bot</span>
+                    <span class="tech-tag">Dictionary</span>
+                    <span class="tech-tag">livechat</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-pwn" data-ctf="CTF@AC" data-category="pwn" data-writeup="fini.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">💡</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Fini</h3>
+                    <p class="challenge-category">Pwn • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"Hope you can FINIsh this challenge."</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">FormatStringAttack</span>
+                    <span class="tech-tag">Printf</span>
+                    <span class="tech-tag">PIE</span>
+                    <span class="tech-tag">Overwrite</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="writeup-card category-osint" data-ctf="CTF@AC" data-category="osint" data-writeup="prison.html" onclick="openWriteup(this)">
+            <div class="card-header">
+                <div class="challenge-icon">👮</div>
+                <div class="challenge-title">
+                    <h3 class="challenge-name">Prison</h3>
+                    <p class="challenge-category">Osint • CTF@AC</p>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="challenge-description">"You're going to prison kid.There's no way around that. Take a good look and learn your betters. Your life will depend on them now. This ain't no scandinavian heaven where you're handed everything on a silver platter."</p>
+                <div class="challenge-tags">
+                    <span class="tech-tag">Minecraft</span>
+                    <span class="tech-tag">Skins</span>
+                    <span class="tech-tag">Server</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container">
+        <h2>📚 About These Writeups</h2>
+        <p>These writeups document various CTF challenges. Each writeup includes:</p>
+        <ul style="padding-left: 20px;">
+            <li>🔍 <strong>Detailed Analysis:</strong> Step-by-step problem-solving approach</li>
+            <li>💡 <strong>Key Insights:</strong> Critical discoveries and breakthrough moments</li>
+            <li>🛠️ <strong>Technical Solutions:</strong> Complete scripts and explanations</li>
+            <li>🎯 <strong>Learning Points:</strong> Takeaways and best practices</li>
+            <li>🧠 <strong>Deep Dives:</strong> Technical background and context</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🏷️ Categories Covered</h2>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 4px; height: 20px; background-color: #ff6b35; border-radius: 2px;"></div>
+                <span>🕵️ <strong>Forensic:</strong> Network analysis, PCAP investigation, data extraction</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 4px; height: 20px; background-color: #f7931e; border-radius: 2px;"></div>
+                <span>🔐 <strong>Crypto:</strong> RSA vulnerabilities, cryptanalysis techniques</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 4px; height: 20px; background-color: #9b59b6; border-radius: 2px;"></div>
+                <span>🎯 <strong>Misc:</strong> Programming languages, astronomy, creative problem solving</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 4px; height: 20px; background-color: #3498db; border-radius: 2px;"></div>
+                <span>🌐 <strong>Web:</strong> XSS, injection attacks, web application security</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 4px; height: 20px; background-color: #5d00a8; border-radius: 2px;"></div>
+                <span>💥 <strong>Pwn:</strong> Binary exploitation, buffer overflows, memory corruption</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 4px; height: 20px; background-color: #2ecc71; border-radius: 2px;"></div>
+                <span>🔍 <strong>Reverse:</strong> Reverse engineering, malware analysis, binary analysis</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - CTF Writeups Collection by CuboConNoveQuadrati</p>
+        <p>📧 Happy hacking and continuous learning! 🚀</p>
+    </div>
+
+    <!-- Modal for writeups -->
+    <div class="modal-overlay" id="writeup-modal">
+        <div class="modal-content" id="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Writeup</h3>
+                <h4 id="modal-url"></h4>
+                <button class="close-modal" id="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <iframe class="writeup-iframe" id="writeup-iframe" frameborder="0"></iframe>
+                <div class="iframe-error hidden" id="iframe-error">
+                    <div class="iframe-error-icon">⚠️</div>
+                    <h3>Error Loading Writeup</h3>
+                    <p>Sorry, we couldn't load the writeup for this challenge.</p>
+                    <p>Please try again later or check if the file exists.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filter functionality
+        const ctfFilter = document.getElementById('ctf-filter');
+        const categoryFilter = document.getElementById('category-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const filterCount = document.getElementById('filter-count');
+        const writeupCards = document.querySelectorAll('.writeup-card');
+
+        // Modal elements
+        const modal = document.getElementById('writeup-modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalTitle = document.getElementById('modal-title');
+        const modalUrl = document.getElementById('modal-url');
+        const writeupIframe = document.getElementById('writeup-iframe');
+        const iframeError = document.getElementById('iframe-error');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        // Category color mapping
+        const categoryColors = {
+            'forensic': '#ff6b35',
+            'crypto': '#f7931e',
+            'misc': '#9b59b6',
+            'web': '#3498db',
+            'pwn': '#5d00a8',
+            'reverse': '#2ecc71'
+        };
+
+        // Open writeup in modal
+        function openWriteup(card) {
+            const writeupFile = card.getAttribute('data-writeup');
+            const challengeName = card.querySelector('.challenge-name').textContent;
+            const category = card.getAttribute('data-category');
+            
+            // Set modal title
+            modalTitle.textContent = challengeName;
+
+            // Set modal url
+            let urlObj = new URL(window.location.href);
+            let pathname = urlObj.pathname.replace(/index\.html/, "");
+            let cleanUrl = urlObj.origin + pathname;
+
+            modalUrl.textContent = cleanUrl + writeupFile;
+            modalUrl.style.color = "grey";
+            
+            // Set border color based on category
+            modalContent.style.borderLeft = `6px solid ${categoryColors[category] || '#0d7377'}`;
+            
+            // Reset iframe error
+            iframeError.classList.add('hidden');
+            writeupIframe.classList.remove('hidden');
+            
+            // Load writeup in iframe
+            writeupIframe.onload = function() {
+                // Hide loading indicator if needed
+            };
+            
+            writeupIframe.onerror = function() {
+                writeupIframe.classList.add('hidden');
+                iframeError.classList.remove('hidden');
+            };
+            
+            writeupIframe.src = writeupFile;
+            
+            // Show modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        // Close modal
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scrolling
+            
+            // Reset iframe source
+            setTimeout(() => {
+                writeupIframe.src = '';
+            }, 300);
+        }
+
+        // Close modal when clicking outside content
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal when clicking close button
+        closeModalBtn.addEventListener('click', closeModal);
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Get URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                ctf: params.get('ctf') || 'all',
+                category: params.get('category') || 'all'
+            };
+        }
+
+        // Update URL without refresh
+        function updateUrl(ctf, category) {
+            const params = new URLSearchParams();
+            if (ctf !== 'all') params.set('ctf', ctf);
+            if (category !== 'all') params.set('category', category);
+            
+            const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+            window.history.replaceState({}, '', newUrl);
+        }
+
+        // Filter cards based on selection
+        function filterCards() {
+            const selectedCtf = ctfFilter.value;
+            const selectedCategory = categoryFilter.value;
+            let visibleCount = 0;
+
+            writeupCards.forEach(card => {
+                const cardCtf = card.getAttribute('data-ctf');
+                const cardCategory = card.getAttribute('data-category');
+                
+                const matchesCtf = selectedCtf === 'all' || cardCtf === selectedCtf;
+                const matchesCategory = selectedCategory === 'all' || cardCategory === selectedCategory;
+                
+                if (matchesCtf && matchesCategory) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            // Update URL
+            updateUrl(selectedCtf, selectedCategory);
+            
+            // Update statistics
+            updateStats();
+        }
+
+        // Update statistics in header
+        function updateStats() {
+            const visibleCards = document.querySelectorAll('.writeup-card:not(.hidden)');
+            const ctfs = new Set();
+            const categories = new Set();
+            
+            visibleCards.forEach(card => {
+                ctfs.add(card.getAttribute('data-ctf'));
+                categories.add(card.getAttribute('data-category'));
+            });
+            
+            document.getElementById('total-challenges').textContent = `📊 ${visibleCards.length} Challenges Solved`;
+            document.getElementById('total-ctfs').textContent = `🎪 ${ctfs.size} CTFs Covered`;
+            document.getElementById('total-categories').textContent = `🎯 ${categories.size} Categories Covered`;
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            ctfFilter.value = 'all';
+            categoryFilter.value = 'all';
+            filterCards();
+        }
+
+        // Initialize filters from URL
+        function initializeFromUrl() {
+            const params = getUrlParams();
+            
+            // Populate CTF options dynamically
+            const ctfs = new Set();
+            writeupCards.forEach(card => {
+                ctfs.add(card.getAttribute('data-ctf'));
+            });
+            
+            // Clear existing options except "All CTFs"
+            ctfFilter.innerHTML = '<option value="all">All CTFs</option>';
+            
+            // Add CTF options alphabetically
+            Array.from(ctfs).sort().forEach(ctf => {
+                const option = document.createElement('option');
+                option.value = ctf;
+                option.textContent = ctf;
+                ctfFilter.appendChild(option);
+            });
+            
+            // Set values from URL parameters
+            ctfFilter.value = params.ctf;
+            categoryFilter.value = params.category;
+            
+            filterCards();
+        }
+
+        // Event listeners
+        ctfFilter.addEventListener('change', filterCards);
+        categoryFilter.addEventListener('change', filterCards);
+        clearFiltersBtn.addEventListener('click', clearFilters);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeFromUrl);
+
+        // Add click animations
+        document.querySelectorAll('.writeup-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Add a ripple effect
+                const ripple = document.createElement('div');
+                const rect = card.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                card.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    </script>
+    <style>
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(20, 255, 236, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+
+</html>

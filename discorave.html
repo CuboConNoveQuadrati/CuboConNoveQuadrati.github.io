@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - fini Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .time-info {
+            background-color: #2a1a1a;
+            border: 1px solid #664444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .vulnerability-box {
+            background-color: #2a1a1a;
+            border: 2px solid #ff4444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .success-box {
+            background-color: #1a2a1a;
+            border: 2px solid #44ff44;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>💃 Challenge: disco_rave</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: misc</div>
+            <div>💯 Points: 293</div>
+            <div>📊 Solves: 19</div>
+            <div>👤 Author: Unknown</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>"This is so infuriating! I know exactly what to do , but those damn trolls won't let me ! This feels like that prisoner's dilema I heard about."</p>
+        </div>
+        <p><strong>📁 Files:</strong> route.ts, server.py</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Analysis</h2>
+        <p>This challenge was described as a more complex version of a previous "disco_dance" challenge, and it immediately caught my attention with its intriguing description mentioning "trolls" and the "prisoner's dilemma." After examining the provided files, I discovered this was a cryptographic challenge involving Discord API integration with a fascinating social coordination problem.</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Key Discoveries:</strong></p>
+            <ul>
+                <li>🔐 AES encryption protecting the flag</li>
+                <li>🌱 Seed generation from Discord channel messages</li>
+                <li>📊 Two Discord channels providing entropy</li>
+                <li>⏰ Message timestamps included in seed calculation</li>
+                <li>🚫 Automated message posting strictly prohibited</li>
+                <li>🎭 The "prisoner's dilemma" - coordination problem between players</li>
+            </ul>
+        </div>
+
+        <p>Looking at the server.py file revealed the core mechanism:</p>
+
+        <pre><code class="language-python">def get_random() -> bytes:
+    channels = [
+        "1416908413375479891",
+        "1417154025371209852",
+    ]
+    headers = {
+        "Authorization": f"Bot {os.getenv('TOKEN')}",
+    }
+
+    all_data = []
+
+    for channel_id in channels:
+        url = f"https://proxy-gamma-steel-32.vercel.app/api/proxy/channels/{channel_id}/messages?limit=10"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        messages = response.json()
+
+        for msg in messages:
+            content = msg.get("content", "")
+            timestamp = msg.get("timestamp", "")
+            all_data.append(f"{content}{timestamp}")
+
+    concatenated = "".join(all_data).encode("utf-8")
+    return concatenated</code></pre>
+
+        <div class="vulnerability-box">
+            <p>⚠️ <strong>The Coordination Challenge:</strong><br>
+            The seed was generated from the last 10 messages from TWO Discord channels, including their timestamps. Since automated posting was forbidden, success required waiting for the channels to become stable without spam!</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ The Prisoner's Dilemma Strategy</h2>
+
+        <div class="step">
+            <h3>🎭 Step 1: Understanding the Social Challenge</h3>
+            <p>The challenge description mentioning "trolls" and "prisoner's dilemma" suddenly made perfect sense. Unlike the simpler disco_dance challenge, this version required coordination between multiple players:</p>
+            
+            <ul>
+                <li>🎯 <strong>Goal:</strong> Get stable message state in TWO Discord channels</li>
+                <li>🚫 <strong>Constraint:</strong> No automated posting allowed</li>
+                <li>👥 <strong>Problem:</strong> Other players might spam the channels</li>
+                <li>⏰ <strong>Timing:</strong> Need to capture the exact moment when channels are stable</li>
+            </ul>
+            
+            <p>The "prisoner's dilemma" aspect was clear: if everyone cooperated by not spamming, everyone could solve the challenge. But if people chose to spam (defect), it would ruin the solution for others!</p>
+        </div>
+
+        <div class="step">
+            <h3>📊 Step 2: Enhanced Seed Generation Analysis</h3>
+            <p>The disco_rave version was significantly more complex than disco_dance:</p>
+            
+            <div class="highlight-section">
+                <p>💭 <strong>Complexity Differences:</strong></p>
+                <ul>
+                    <li>🔢 <strong>Two channels</strong> instead of one</li>
+                    <li>📝 <strong>10 messages per channel</strong> instead of 5 total</li>
+                    <li>⏰ <strong>Timestamps included</strong> in the seed</li>
+                    <li>🌐 <strong>API formatting requirements</strong> for timestamps</li>
+                </ul>
+            </div>
+            
+            <p>The seed generation algorithm concatenated: <code>content1 + timestamp1 + content2 + timestamp2 + ... (for all 20 messages)</code></p>
+
+            <div class="key-point">
+                <p>💡 <strong>Critical Insight:</strong><br>
+                The timestamp format had to match exactly what the Discord API returned: <code>2025-09-15T18:11:50.040000+00:00</code> format, not the browser's default ISO format!</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>⏰ Step 3: The Waiting Game</h3>
+            <p>Since automated posting was forbidden, I had to wait for a natural lull in both Discord channels. This required patience and timing:</p>
+
+            <div class="time-info">
+                <p>⏱️ <strong>Strategy:</strong><br>
+                Monitor both channels until the spam died down, then quickly extract the message data before anyone else posted new messages!</p>
+            </div>
+
+            <p>I prepared my extraction script and waited for the right moment when both channels became stable.</p>
+        </div>
+
+        <div class="step">
+            <h3>🖥️ Step 4: Browser Console Data Extraction</h3>
+            <p>To extract the exact message data and timestamps in the correct format, I developed a JavaScript snippet to run in the browser console:</p>
+
+            <pre><code class="language-javascript">console.log(
+  Array.from(document.querySelectorAll('div.message__5126c'))
+    .slice(-10)
+    .reverse()
+    .map(m => {
+      const text = m.querySelector('div.markup__75297')?.innerText.trim() || "";
+      const iso = new Date(m.querySelector('time')?.getAttribute('datetime')).toISOString();
+      // Convert from "2025-09-15T18:11:50.040Z" to "2025-09-15T18:11:50.040000+00:00"
+      const formatted = iso.replace('Z', '000+00:00');
+      return text + formatted;
+    })
+    .join("")
+);</code></pre>
+
+            <p>🧠 <strong>Script breakdown:</strong></p>
+            <ol>
+                <li>Select the last 10 messages from the current Discord channel</li>
+                <li>Reverse the order to match API response order</li>
+                <li>Extract both message content and timestamp</li>
+                <li>Format timestamp to match Discord API format exactly</li>
+                <li>Concatenate content + formatted timestamp for each message</li>
+                <li>Join all results into a single seed string</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 5: The Perfect Moment</h3>
+            <p>After monitoring the channels for a while, I finally found the perfect moment when both channels had stable message states. I quickly ran my extraction script on both channels and obtained the complete seed data.</p>
+            
+            <div class="success-box">
+                <p>💡 <strong>Success Conditions Met:</strong><br>
+                - Both channels stable (no new messages)<br>
+                - Extracted all 20 messages with correct timestamps<br>
+                - Seed data ready for decryption attempt</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🐍 Flag Decryption Script</h2>
+
+        <pre><code class="language-python">from pwn import *
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+from Crypto.Hash import SHA256
+import base64
+
+# Known seed from Discord messages (extracted using browser console)
+# This represents the concatenated content+timestamp from both channels
+seed = b"....." # [Actual seed data extracted from channels]
+
+# Connect to server and get encrypted data
+io = remote("ctf.ac.upt.ro", 9829)
+encrypted_data = base64.b64decode(io.recvline(False).split(b"'")[3])
+io.close()
+
+# Extract IV and encrypted flag
+iv, enc_flag = encrypted_data[:16], encrypted_data[16:]
+
+# Regenerate the AES key using the same method as server
+digest = SHA256.new()
+digest.update(seed)
+aes_key = digest.digest()
+
+# Decrypt the flag
+cipher = AES.new(aes_key, AES.MODE_CBC, iv)
+flag = unpad(cipher.decrypt(enc_flag), AES.block_size)
+
+print("Flag:", flag.decode())</code></pre>
+
+        <div class="step">
+            <h3>📋 Decryption Process</h3>
+            <p>🔧 <strong>How the decryption works:</strong></p>
+            <ol>
+                <li><strong>Seed Preparation:</strong> Use the extracted Discord message data as the seed</li>
+                <li><strong>Server Connection:</strong> Connect to challenge server and retrieve encrypted flag</li>
+                <li><strong>Data Parsing:</strong> Extract IV (first 16 bytes) and encrypted flag from base64 data</li>
+                <li><strong>Key Generation:</strong> Hash the seed with SHA256 to recreate the AES key</li>
+                <li><strong>Decryption:</strong> Use AES-CBC with the generated key and extracted IV</li>
+                <li><strong>Flag Extraction:</strong> Unpad the decrypted data to reveal the flag</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🏆 Flag and Victory</h2>
+        <div class="flag">
+            🚩 ctf{ciao}
+        </div>
+        
+        <p>After successfully waiting for the Discord channels to stabilize, extracting the correct message data with precise timestamp formatting, and running the decryption script, I finally obtained the flag! The social coordination aspect of this challenge made it particularly satisfying to solve - it required not just technical skills, but also patience and timing. 🎉</p>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🕰️ <strong>Patience and Timing:</strong> Sometimes CTF challenges require waiting for the right moment</li>
+            <li>🤝 <strong>Social Coordination:</strong> Understanding game theory and cooperation dynamics</li>
+            <li>🎯 <strong>Precise Data Extraction:</strong> Exact timestamp formatting is crucial for cryptographic seeds</li>
+            <li>🌐 <strong>API Understanding:</strong> Discord API response format must be replicated exactly</li>
+            <li>🔐 <strong>Cryptographic Dependencies:</strong> External data sources can create vulnerabilities</li>
+            <li>🧠 <strong>Browser Console Mastery:</strong> JavaScript in dev tools for data extraction</li>
+            <li>⚖️ <strong>Prisoner's Dilemma:</strong> Competition vs cooperation in multiplayer challenges</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        <h3>Discord API Integration</h3>
+        <p>The challenge used Discord's API to fetch messages from two specific channels, creating a dynamic seed based on real-time chat data:</p>
+        
+        <div class="vulnerability-box">
+            <p><strong>Endpoint:</strong> <code>/api/proxy/channels/{channel_id}/messages?limit=10</code><br>
+            <strong>Headers:</strong> Bot authorization token required<br>
+            <strong>Data:</strong> Message content + ISO timestamp</p>
+        </div>
+        
+        <h3>Cryptographic Implementation</h3>
+        <p>The server implemented standard AES encryption with a non-standard key derivation:</p>
+        <ul>
+            <li>AES-256 in CBC mode for encryption</li>
+            <li>SHA-256 hash of concatenated Discord messages as key</li>
+            <li>PKCS7 padding for message alignment</li>
+            <li>Random IV generated for each encryption</li>
+        </ul>
+        
+        <h3>The Social Engineering Element</h3>
+        <p>The true genius of this challenge was combining technical cryptography with social dynamics. The "prisoner's dilemma" reference was apt:</p>
+        
+        <div class="math">
+            Cooperation: Everyone waits → Everyone can solve<br>
+            Defection: Someone spams → Nobody can solve<br>
+            Mixed Nash Equilibrium: Unpredictable outcomes
+        </div>
+        
+        <h3>Timestamp Format Precision</h3>
+        <p>The challenge required exact replication of Discord API timestamp format:</p>
+        <div class="key-point">
+            <p><strong>Browser ISO:</strong> <code>2025-09-15T18:11:50.040Z</code><br>
+            <strong>API Format:</strong> <code>2025-09-15T18:11:50.040000+00:00</code><br>
+            <strong>Conversion:</strong> Replace 'Z' with '000+00:00'</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🚀</p>
+    </div>
+</body>
+
+</html>

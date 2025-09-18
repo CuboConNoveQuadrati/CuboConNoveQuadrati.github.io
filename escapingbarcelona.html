@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - Repeated RSA Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .time-info {
+            background-color: #2a1a1a;
+            border: 1px solid #664444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🚀 Challenge: Escaping Barcelona</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: Misc</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 50</div>
+            <div>👤 Author: 0v3rCl0kEd</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>We must leave this planet at exactly 18:00 UTC+2 on 7th of November 2025. Leaving from Barcelona so act quick and give me the distance to Mars.</p>
+            <p><strong>Flag format:</strong> ctf{123.456 M km} - note the spaces and number format!</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🌌 Initial Analysis</h2>
+        <p>This challenge immediately caught my attention with its space-themed premise! The task seemed straightforward but required some astronomical calculations:</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Mission Requirements:</strong></p>
+            <ul>
+                <li>📍 Calculate distance from Barcelona to Mars</li>
+                <li>⏰ At a specific date and time: November 7th, 2025 at 18:00 UTC+2</li>
+                <li>🎯 Return result in millions of kilometers with precise formatting</li>
+            </ul>
+        </div>
+
+        <p>The challenge was essentially asking me to compute the distance between Earth (specifically Barcelona) and Mars at a given moment in time. This required understanding orbital mechanics and finding the right tools for astronomical calculations.</p>
+
+        <div class="time-info">
+            <p>⏱️ <strong>Time Zone Conversion:</strong><br>
+            18:00 UTC+2 = 16:00 UTC<br>
+            This conversion was crucial for accurate planetary position calculations!</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Research and Solution Development</h2>
+
+        <div class="step">
+            <h3>🔍 Step 1: Finding the Right Tools</h3>
+            <p>My first thought was: "How do you even calculate the distance between a city on Earth and a planet?" This isn't your typical geometry problem - it involves:</p>
+            
+            <ul>
+                <li>🌍 Earth's rotation and position in its orbit</li>
+                <li>🔴 Mars' position in its orbit around the Sun</li>
+                <li>📍 Barcelona's specific geographical coordinates</li>
+                <li>⏰ Time-dependent planetary positions</li>
+            </ul>
+            
+            <p>I started researching Python libraries for astronomical calculations and discovered several options. However, one library kept appearing in recommendations from astronomy experts and professionals:</p>
+            
+            <div class="highlight-section">
+                <p>⭐ <strong>PyEphem:</strong> A scientific-grade astronomical computation library that's been the go-to choice for precise planetary calculations since the 1990s.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>📍 Step 2: Gathering Barcelona's Coordinates</h3>
+            <p>For accurate calculations, I needed Barcelona's precise geographical coordinates. I turned to Wikipedia (a surprisingly reliable source for basic geographical data):</p>
+            
+            <div class="math">
+                Barcelona Coordinates:<br>
+                Latitude: 41.3825° N<br>
+                Longitude: 2.1769° E
+            </div>
+            
+            <p>These coordinates would serve as the observation point from which to calculate Mars' distance.</p>
+        </div>
+
+        <div class="step">
+            <h3>🧠 Step 3: Understanding the PyEphem Library</h3>
+            <p>Working with astronomical libraries can be tricky - they often have specific conventions and requirements. I leveraged AI assistance to understand:</p>
+            
+            <ul>
+                <li>🌍 How to set up an Earth-based observer</li>
+                <li>📅 Proper date/time formatting for astronomical calculations</li>
+                <li>🪐 Planet object instantiation and computation</li>
+                <li>📏 Distance unit conversions (AU to kilometers)</li>
+            </ul>
+            
+            <div class="key-point">
+                <p>💡 <strong>Key Insight:</strong> Astronomical distances are typically measured in Astronomical Units (AU), where 1 AU ≈ 149,597,870.7 km (the average distance from Earth to the Sun).</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🐍 Step 4: Implementation</h3>
+            <p>With all the pieces in place, I developed a Python script to calculate the Earth-Mars distance:</p>
+
+            <pre><code class="language-python">import ephem
+
+# Barcelona coordinates (from Wikipedia)
+lat = '41.3825'  # Latitude in decimal degrees
+lon = '2.1769'   # Longitude in decimal degrees
+
+# Create the observer at Barcelona
+barcelona = ephem.Observer()
+barcelona.lat = lat
+barcelona.lon = lon
+barcelona.date = '2025/11/07 16:00:00'  # 18:00 UTC+2 = 16:00 UTC
+
+# Create Mars object and compute its position
+mars = ephem.Mars(barcelona.date)
+mars.compute(barcelona)
+
+# Get distance in Astronomical Units
+distance_au = mars.earth_distance
+
+# Convert AU to kilometers (1 AU ≈ 149,597,870.7 km)
+distance_km = distance_au * 149597870.7
+
+# Convert to millions of km and format according to flag requirements
+distance_million_km = round(distance_km / 1_000_000, 3)
+
+# Generate the flag in the specified format
+flag = f"ctf{{{distance_million_km} M km}}"
+print("Flag:", flag)</code></pre>
+
+            <p>🧠 <strong>How this works:</strong></p>
+            <ol>
+                <li>Set up Barcelona as the observation point with precise coordinates</li>
+                <li>Convert the given time (18:00 UTC+2) to UTC (16:00)</li>
+                <li>Create a Mars object for the specific date and time</li>
+                <li>Compute Mars' position relative to the Barcelona observer</li>
+                <li>Extract the Earth-Mars distance in Astronomical Units</li>
+                <li>Convert AU to kilometers, then to millions of kilometers</li>
+                <li>Format the result according to the flag specification</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 5: Flag Generation</h3>
+            <p>Running the script generated the precise distance calculation for the specified date and time. The beauty of using a professional astronomical library is that it accounts for all the complex orbital mechanics automatically! 🎊</p>
+            
+            <div class="flag">
+                🚩 ctf{361.292 M km}
+            </div>
+            
+            <p>The flag format was crucial - it needed to include the exact spacing and unit formatting as specified in the challenge description.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🌌 Astronomical Context</h2>
+        <p>This challenge provided a fascinating glimpse into real astronomical calculations. The distance between Earth and Mars varies dramatically due to their elliptical orbits:</p>
+        
+        <ul>
+            <li>🔴 <strong>Closest Approach:</strong> ~54.6 million km (during opposition)</li>
+            <li>🔴 <strong>Farthest Distance:</strong> ~401 million km (during conjunction)</li>
+            <li>🔴 <strong>Our Calculation:</strong> 361.292 million km (relatively far apart)</li>
+        </ul>
+        
+        <p>The specific date in November 2025 places Mars at a considerable distance from Earth, which explains why our calculated value is closer to the maximum possible distance.</p>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🌍 <strong>Real-World Applications:</strong> CTF challenges can involve genuine scientific calculations</li>
+            <li>📚 <strong>Library Research:</strong> Finding the right tool is often half the battle</li>
+            <li>⏰ <strong>Time Zone Precision:</strong> UTC conversions are critical for astronomical calculations</li>
+            <li>🎯 <strong>Format Compliance:</strong> Pay attention to exact flag formatting requirements</li>
+            <li>🤖 <strong>AI Assistance:</strong> Modern AI can help understand complex library documentation</li>
+            <li>📍 <strong>Coordinate Accuracy:</strong> Precise geographical data matters for astronomical calculations</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        <h3>Why PyEphem?</h3>
+        <p>PyEphem is based on the XEphem astronomical software and provides:</p>
+        <ul>
+            <li>High-precision planetary position calculations</li>
+            <li>Accurate time handling for astronomical events</li>
+            <li>Support for Earth-based observers at any location</li>
+            <li>Reliable orbital mechanics computations</li>
+        </ul>
+        
+        <h3>The Mathematics Behind It</h3>
+        <p>The library handles complex calculations including:</p>
+        <ul>
+            <li>Kepler's laws of planetary motion</li>
+            <li>Gravitational perturbations</li>
+            <li>Earth's rotation and precession</li>
+            <li>Light-time corrections</li>
+        </ul>
+        
+        <div class="math">
+            Distance Conversion:<br>
+            1 AU = 149,597,870.7 km<br>
+            361.292 M km = ~2.416 AU
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🚀</p>
+    </div>
+</body>
+
+</html>

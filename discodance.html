@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - disco_dance Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .error-output {
+            background-color: #2a1515;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #cc4444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ffaaaa;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .language-mapping {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>💃 Challenge: disco_dance</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: Misc</div>
+            <div>💯 Points: 218</div>
+            <div>📊 Solves: 22</div>
+            <div>👤 Author: Unknown</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>I heard disco parties can be pretty random and chaotic. Let's see just how chaotic.</p>
+        </div>
+        <p><strong>📁 Files:</strong> <code>route.ts</code>, <code>server.py</code></p>
+        <p><strong>🌐 Server:</strong> <code>ctf.ac.upt.ro:9553</code></p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Exploration</h2>
+        <p>The challenge provided two source code files: a Python server file and a route.ts file. After examining the code, I discovered it was an AES encryption challenge with an interesting twist - the encryption key was derived from Discord messages.</p>
+        
+        <pre><code class="language-python">import socket, os, time, random, binascii,requests
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+from Crypto.Hash import SHA256
+from Crypto.Random import get_random_bytes
+import base64
+
+fd=os.open("/opt/app/random", os.O_RDONLY)
+def get_random() -> bytes:
+    url = f"https://proxy-gamma-steel-32.vercel.app/api/proxy/channels/1416908413375479891/messages?limit=5"
+    headers = {
+        "Authorization": f"Bot {os.getenv('TOKEN')}",
+    }
+
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    messages = response.json()
+
+    concatenated = "".join(msg["content"] for msg in messages).encode("utf-8")
+    return concatenated
+
+def encrypt(data: bytes, key: bytes) -> str:
+    digest = SHA256.new()
+    digest.update(key)
+    aes_key = digest.digest()
+
+    iv = get_random_bytes(16)
+
+    padded_data = pad(data, AES.block_size)
+
+    cipher = AES.new(aes_key, AES.MODE_CBC, iv)
+    ciphertext = cipher.encrypt(padded_data)
+
+    return base64.b64encode(iv + ciphertext).decode()
+
+
+def handle_client(c, flag):
+    seed = get_random()
+    print(seed, flush=True)
+    encrypted_flag = encrypt(flag, seed)
+    out = {
+        "encrypted": encrypted_flag
+    }
+    c.sendall((str(out) + "\n").encode())
+
+def main():
+    flag=os.environ.get("FLAG","you ran this locally, duh").encode()
+    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(("0.0.0.0",5000))
+    s.listen(64)
+    while True:
+        c,a=s.accept()
+        try:
+            handle_client(c, flag)
+        finally:
+            c.close()
+
+if __name__=="__main__":
+    main()
+        </code></pre>
+
+        <div class="key-point">
+            <p>🕵️ <strong>First Observations:</strong></p>
+            <ul>
+                <li>🔐 AES encryption used to protect the flag</li>
+                <li>🗝️ Key generation based on SHA256 hash of a seed</li>
+                <li>🌱 Seed derived from Discord channel messages</li>
+                <li>🤖 Server returns IV + encrypted flag</li>
+                <li>🎯 Need to control the seed to generate the correct key</li>
+            </ul>
+        </div>
+
+        <p>The challenge seemed deceptively simple at first glance, but had an interesting social engineering component.</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Research and Discovery</h2>
+
+        <div class="step">
+            <h3>🔎 Step 1: Analyzing the Source Code</h3>
+            <p>Examining the server.py file revealed the encryption mechanism:</p>
+            
+            <div class="command">
+                # Key generation pseudocode<br>
+                seed = get_last_5_discord_messages()<br>
+                digest = SHA256.new(seed)<br>
+                aes_key = digest.digest()<br>
+                <br>
+                # Encryption<br>
+                iv = random_bytes(16)<br>
+                cipher = AES.new(aes_key, AES.MODE_CBC, iv)<br>
+                encrypted_flag = cipher.encrypt(pad(flag))<br>
+                <br>
+                # Response<br>
+                return iv + encrypted_flag<br>
+            </div>
+            
+            <div class="key-point">
+                <p>🔍 <strong>Critical Insight:</strong> The encryption key was derived from the last 5 messages in a specific Discord channel ("spam"), making the challenge controllable if we could influence these messages.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>💬 Step 2: Influencing the Discord Channel</h3>
+            <p>To control the seed value, I needed to send 5 messages to the CTF's Discord "spam" channel:</p>
+            
+            <div class="command">
+                Message 1: a<br>
+                Message 2: a<br>
+                Message 3: a<br>
+                Message 4: a<br>
+                Message 5: a<br>
+            </div>
+            
+            <p>This created a predictable seed value of <code>b"aaaaa"</code> that I could use to regenerate the encryption key.</p>
+        </div>
+
+        <div class="step">
+            <h3>🌐 Step 3: Retrieving the Encrypted Flag</h3>
+            <p>After setting the seed, I connected to the challenge server to retrieve the encrypted flag:</p>
+            
+            <div class="command">
+                $ nc ctf.ac.upt.ro 9553<br>
+                {'encrypted': '1iLWKtwgUnZRMyIo6Gtm6iUUivYx89Wc8C22n7Z8Iu+7beSsnj6g5vV4wwYcaciTd2OezUEscd2O60EIJ/OpbrO/Lv/fBjHVaEkN3137g2TYinmyGJqK2cfj+usArsP/'}
+
+            </div>
+            
+            <p>The server responded with the IV and encrypted flag concatenated together and base64-encoded.</p>
+        </div>
+
+        <div class="step">
+            <h3>🔓 Step 4: Decrypting the Flag</h3>
+            <p>With the known seed and retrieved encrypted data, I could now decrypt the flag:</p>
+
+            <pre><code class="language-python">from pwn import *
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+from Crypto.Hash import SHA256
+
+# Known seed from Discord messages
+seed = b"aaaaa"
+
+# Connect to server and get encrypted data
+io = remote("ctf.ac.upt.ro", 9553)
+encrypted_data = base64.b64decode(io.recvline(False).split(b"'")[3])
+io.close()
+
+# Extract IV and encrypted flag
+iv, enc_flag = encrypted_data[:16], encrypted_data[16:]
+
+# Regenerate the AES key
+digest = SHA256.new()
+digest.update(seed)
+aes_key = digest.digest()
+
+# Decrypt the flag
+cipher = AES.new(aes_key, AES.MODE_CBC, iv)
+flag = unpad(cipher.decrypt(enc_flag), AES.block_size)
+
+print("Flag:", flag.decode())</code></pre>
+
+            <p>🧠 <strong>How this works:</strong></p>
+            <ol>
+                <li>Use the known seed value <code>b"aaaaa"</code></li>
+                <li>Connect to the challenge server and retrieve the encrypted data</li>
+                <li>Extract the IV (first 16 bytes) and encrypted flag</li>
+                <li>Regenerate the AES key by hashing the seed with SHA256</li>
+                <li>Decrypt the flag using AES-CBC mode with the generated key and IV</li>
+                <li>Unpad and display the decrypted flag</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 5: Flag Capture</h3>
+            <p>Executing the decryption script successfully revealed the flag!</p>
+            
+            <div class="flag">
+                🚩 CTF{f55ba4939edd5611a7ab797529b51dae47989b3c5a99f2ffc82e4b2c74d03e56}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 Technical Insights</h2>
+        <h3>About the Vulnerability</h3>
+        <p>This challenge demonstrated several important cryptographic concepts:</p>
+        <ul>
+            <li>🔐 AES-CBC encryption mode and its usage</li>
+            <li>🗝️ Key derivation from external sources (Discord messages)</li>
+            <li>🌱 The importance of unpredictable seeds in cryptographic systems</li>
+            <li>🎯 Controllable external inputs leading to security vulnerabilities</li>
+        </ul>
+        
+        <h3>Cryptographic Details</h3>
+        <p>The challenge implementation used standard cryptographic primitives:</p>
+        <ul>
+            <li>AES-256 in CBC mode for encryption</li>
+            <li>SHA-256 for key derivation</li>
+            <li>PKCS7 padding for message alignment</li>
+            <li>Random IV for each encryption operation</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔍 <strong>Code Analysis:</strong> Thoroughly examine source code for cryptographic implementations</li>
+            <li>🌐 <strong>External Dependencies:</strong> Be wary of systems that derive security from external, controllable inputs</li>
+            <li>🗝️ <strong>Key Management:</strong> Cryptographic keys should be generated from unpredictable sources</li>
+            <li>🔓 <strong>Cryptographic Attacks:</strong> When you control the inputs, you can often break the system</li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 💃</p>
+    </div>
+</body>
+
+</html>

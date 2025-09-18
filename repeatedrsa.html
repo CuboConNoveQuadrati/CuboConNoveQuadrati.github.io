@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - Repeated RSA Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🔐 Challenge: Repeated RSA</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🔢 Category: Crypto</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 101</div>
+            <div>👤 Author: 0v3rCl0kEd</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>We've been told that multiple RSA encryptions can strengthen the security. Not sure if it's alright though...</p>
+        </div>
+
+        <p><strong>🌐 Server:</strong> ctf.ac.upt.ro:9475</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Reconnaissance</h2>
+        <p>Connecting to the netcat server, I was presented with what appeared to be a triple-encrypted RSA challenge. The server provided me with:</p>
+
+        <div class="command">
+            nc ctf.ac.upt.ro 9475
+        </div>
+
+        <div class="output">
+            Encrypted Flag: [large_number]<br>
+            n1: [first_modulus]<br>
+            n2: [second_modulus]<br>
+            n3: [third_modulus]<br>
+            e: [public_exponent]<br>
+        </div>
+
+        <p>The challenge description hinted that multiple RSA encryptions were used, suggesting the flag underwent three layers of RSA encryption with different moduli. Without access to the source code, I needed to find a vulnerability in this approach.</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Initial Strategy:</strong> Since I had three moduli but no corresponding private keys, I needed to find a weakness in how these RSA instances were generated.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+
+        <div class="step">
+            <h3>🧮 Step 1: The Factorization Attempt</h3>
+            <p>My first instinct was to try factoring the three moduli to recover the prime factors p and q for each RSA instance. This would allow me to compute the private keys and decrypt each layer.</p>
+            
+            <div class="math">
+                For RSA: n = p × q<br>
+                If we can find p and q, then φ(n) = (p-1)(q-1)<br>
+                Private key: d = e⁻¹ mod φ(n)
+            </div>
+            
+            <p>However, I quickly realized this approach was computationally infeasible. The moduli were too large (likely 1024+ bits each), making traditional factorization methods impractical within a reasonable timeframe. 😤</p>
+            
+            <div class="key-point">
+                <p>⚠️ <strong>Reality Check:</strong> If RSA moduli could be easily factored, RSA wouldn't be secure! There had to be a different vulnerability.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔍 Step 2: The GCD Eureka Moment</h3>
+            <p>Since direct factorization wasn't working, I decided to investigate if there were any relationships between the three moduli. What if they shared common factors?</p>
+            
+            <p>I tested this hypothesis by computing the Greatest Common Divisor (GCD) between pairs of moduli:</p>
+            
+            <div class="math">
+                gcd(n1, n2) = ?<br>
+                gcd(n2, n3) = ?<br>
+                gcd(n1, n3) = ?
+            </div>
+            
+            <div class="highlight-section">
+                <p>💡 <strong>Breakthrough Discovery:</strong> The GCD computations revealed that consecutive moduli shared common prime factors! This meant the RSA key generation was flawed - they reused primes across different key pairs.</p>
+            </div>
+            
+            <p>This is a critical vulnerability because if gcd(n₁, n₂) = p (where p is a prime), then:</p>
+            <ul>
+                <li>n₁ = p × q₁ for some prime q₁</li>
+                <li>n₂ = p × q₂ for some prime q₂</li>
+                <li>We can compute q₁ = n₁ ÷ p and q₂ = n₂ ÷ p</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>🔄 Step 3: Understanding the Encryption Layers</h3>
+            <p>The challenge description mentioned "multiple RSA encryptions," which meant the flag was encrypted in layers:</p>
+            
+            <div class="math">
+                Original Flag → RSA₁(n₁) → RSA₂(n₂) → RSA₃(n₃) → Final Ciphertext
+            </div>
+            
+            <p>To recover the flag, I needed to decrypt in reverse order:</p>
+            
+            <div class="math">
+                Final Ciphertext → RSA₃⁻¹(n₃) → RSA₂⁻¹(n₂) → RSA₁⁻¹(n₁) → Original Flag
+            </div>
+            
+            <p>This meant starting with the last modulus (n₃) and working backwards through each layer of encryption.</p>
+        </div>
+
+        <div class="step">
+            <h3>🐍 Step 4: Implementation</h3>
+            <p>With the vulnerability identified, I implemented a solution that exploits the shared prime factors:</p>
+
+            <pre><code class="language-python">from pwn import *
+import math
+from Crypto.Util.number import long_to_bytes
+
+# Connect to remote service
+io = remote("ctf.ac.upt.ro", 9475)
+
+# Read ciphertext and RSA parameters
+ct = int(io.recvline(False).strip().split(b": ")[1])
+n1 = int(io.recvlines(2)[0].strip().split(b": ")[1])
+n2 = int(io.recvlines(2)[0].strip().split(b": ")[1])
+n3 = int(io.recvlines(2)[0].strip().split(b": ")[1])
+e  = int(io.recvline(False).strip().split(b": ")[1])
+
+# List of moduli for easier iteration
+Ns = [n1, n2, n3]
+
+# Decrypt each layer starting from the last (n3)
+for i in range(len(Ns)-1, -1, -1):
+    # Get current and previous modulus
+    current_n, previous_n = Ns[i], Ns[i-1]
+    
+    # Find shared prime between consecutive moduli
+    p = math.gcd(current_n, previous_n)
+    
+    # Compute the other prime factor
+    q = current_n // p
+    
+    # Calculate Euler's totient function
+    phi = (p - 1) * (q - 1)
+    
+    # Compute private exponent
+    d = pow(e, -1, phi)
+    
+    # Decrypt current layer
+    ct = pow(ct, d, current_n)
+
+# Convert final result back to the original flag
+print("Flag:", long_to_bytes(ct).decode())</code></pre>
+
+            <p>🧠 <strong>How this works:</strong></p>
+            <ol>
+                <li>Connect to the server and extract all RSA parameters</li>
+                <li>For each consecutive pair of moduli, find their GCD (shared prime)</li>
+                <li>Compute the other prime factor by division</li>
+                <li>Calculate φ(n) and the private key d</li>
+                <li>Decrypt the current layer of encryption</li>
+                <li>Repeat until all layers are decrypted</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 5: Flag Recovery</h3>
+            <p>Running the script successfully peeled away all three layers of RSA encryption, revealing the original flag! The key insight was recognizing that the security flaw wasn't in the encryption algorithm itself, but in the key generation process. 🎊</p>
+            
+            <div class="flag">
+                🚩 ctf{3c1315f63d550570a690f693554647b7763c3acbc806ae846ce8d25b5f364d10}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔑 <strong>Key Generation Matters:</strong> Even strong encryption can be broken if keys are generated poorly</li>
+            <li>🧮 <strong>GCD is Powerful:</strong> Greatest Common Divisor can reveal shared factors between large numbers</li>
+            <li>🔄 <strong>Layered Encryption:</strong> Multiple encryption layers require reverse-order decryption</li>
+            <li>⚡ <strong>Prime Reuse:</strong> Never reuse prime factors across different RSA key pairs</li>
+            <li>🎭 <strong>False Security:</strong> More encryption doesn't always mean better security</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        <h3>Why This Attack Works</h3>
+        <p>The vulnerability stems from a fundamental principle in RSA security:</p>
+        
+        <div class="math">
+            If gcd(n₁, n₂) = p > 1, then both n₁ and n₂ share the prime factor p
+        </div>
+        
+        <p>This breaks the assumption that each RSA modulus is the product of exactly two distinct, secret primes. Once we know one prime factor, computing the other is trivial:</p>
+        
+        <div class="math">
+            If n = p × q and we know p, then q = n ÷ p
+        </div>
+        
+        <h3>The Proper Way</h3>
+        <p>Secure RSA implementations ensure:</p>
+        <ul>
+            <li>Each modulus uses completely unique prime factors</li>
+            <li>Primes are generated with sufficient entropy</li>
+            <li>No prime reuse across different key pairs</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🔐</p>
+    </div>
+</body>
+
+</html>
