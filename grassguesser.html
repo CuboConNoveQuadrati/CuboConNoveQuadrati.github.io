@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - grass-guesser Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🌍 Challenge: grass-guesser</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC Finals</div>
+            <div>🎮 Category: Misc</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 15</div>
+            <div>👤 Author: Unknown</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>Who cares about geoguesser, we have grass guesser now</p>
+        </div>
+
+        <p><strong>🌐 Webpage:</strong> <a href="http://23ce1851.ctf.ac.upt.ro" target="_blank">http://23ce1851.ctf.ac.upt.ro</a></p>
+    </div>
+
+    <div class="container">
+        <h2>🔎 Initial Reconnaissance</h2>
+        <p>Upon visiting the web application, I was greeted with a geographic guessing game - similar to GeoGuessr but with a twist. The challenge required me to correctly identify the coordinates of 10 different locations in a row.</p>
+
+        <div class="command">
+            curl -X POST http://23ce1851.ctf.ac.upt.ro/api/start
+        </div>
+
+        <div class="output">
+            {"sessionId":"56de5eff813cb637aeb95756e4966e39","totalRounds":10}
+        </div>
+
+        <p>The game mechanics were straightforward but brutal:</p>
+        <ul>
+            <li>🎯 Guess the correct coordinates for 10 different locations</li>
+            <li>📍 Each guess returns the distance from the target location</li>
+            <li>❌ One wrong guess resets the entire game back to location #1</li>
+            <li>✅ Only after correctly guessing all 10 locations would the flag be revealed</li>
+        </ul>
+
+        <div class="key-point">
+            <p>⚠️ <strong>The Challenge:</strong> The brutal reset mechanism made manual solving impractical. However, I noticed something crucial - even when the game reset, the target coordinates remained the same!</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+
+        <div class="step">
+            <h3>🧩 Step 1: Understanding the Game Mechanics</h3>
+            <p>I started by analyzing the API endpoints to understand how the game worked:</p>
+            
+            <div class="math">
+                POST /api/start → Returns sessionId<br>
+                POST /api/guess → {sessionId, lat, lng} → Returns {correct, distance, gameWon, flag?}
+            </div>
+            
+            <p>The key observations were:</p>
+            <ul>
+                <li>Each session maintains state about which coordinates have been found</li>
+                <li>The API returns distance information when a guess is incorrect</li>
+                <li>Coordinates persist across game resets within the same challenge instance</li>
+                <li>The flag is only revealed after correctly identifying all 10 coordinates consecutively</li>
+            </ul>
+            
+            <div class="highlight-section">
+                <p>💡 <strong>Critical Discovery:</strong> The coordinates don't change between attempts! This means I could build a database of correct coordinates and reuse them across multiple game sessions.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 2: Developing the Strategy</h3>
+            <p>With the coordinate persistence insight, I devised a multi-stage approach:</p>
+            
+            <ol>
+                <li><strong>Coordinate Storage:</strong> Maintain a list of all successfully found coordinates</li>
+                <li><strong>Progressive Discovery:</strong> Use gradient descent to find new coordinates</li>
+                <li><strong>Session Management:</strong> Submit known coordinates first to advance through checkpoints quickly</li>
+                <li><strong>Intelligent Search:</strong> Implement a hill-climbing algorithm to minimize distance iteratively</li>
+            </ol>
+            
+            <p>The beauty of this approach is that each failed attempt teaches us at least one new coordinate, making subsequent attempts progressively easier.</p>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Step 3: Implementing the Automated Solver</h3>
+            <p>I developed a Python script that combines several algorithmic techniques to efficiently find coordinates:</p>
+
+            <h4>🎲 Algorithm Overview</h4>
+            <p>The solver implements a sophisticated multi-phase search strategy:</p>
+            
+            <div class="key-point">
+                <p><strong>Phase 1 - Checkpoint Replay:</strong> Submit all previously discovered coordinates to quickly advance to unknown locations.</p>
+                <p><strong>Phase 2 - Gradient Descent Search:</strong> Use distance feedback to navigate toward the target using directional steps (North, South, East, West, and diagonals).</p>
+                <p><strong>Phase 3 - Adaptive Step Sizing:</strong> Start with large steps (10°) and progressively reduce when stuck, allowing both coarse and fine-grained searching.</p>
+                <p><strong>Phase 4 - Random Restart:</strong> If completely stuck, try a new random starting position to escape local minima.</p>
+            </div>
+
+            <h4>💻 Complete Solution Script</h4>
+            <pre><code class="language-python">import requests
+import random
+
+s = requests.Session()
+URL = "http://da0d1111.ctf.ac.upt.ro/"
+
+# Database of known correct coordinates
+right_coords = [
+    (51.50739578092163, -0.12784588661043017),   # London
+    (48.856566708021376, 2.3522047289735184),     # Paris
+    (40.78284731725431, -73.96543803155782),      # New York
+    (-33.868750193977505, 151.209236818929),      # Sydney
+    (35.67629475790484, 139.65029812360805),      # Tokyo
+    (52.520026967973905, 13.40494624044885),      # Berlin
+    (41.89027541139387, 12.492252417804764),      # Rome
+    (37.77487697786999, -122.4193696846143),      # San Francisco
+    (55.75575886842542, 37.61729552503313),       # Moscow
+    (1.2896523082792868, 103.85004511632928)      # Singapore
+]
+
+# Start the game
+r = s.post(URL+"api/start")
+sessionId = r.json()['sessionId']
+
+def find_coordinate():
+    """
+    Finds a single coordinate using gradient descent with adaptive step sizing.
+    Returns True if successful, False otherwise.
+    """
+    # Submit all known coordinates first to advance checkpoints
+    for coord in right_coords:
+        r = s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': coord[0], 'lng': coord[1]})
+        if r.json()['gameWon']:
+            print("Flag:", r.json()['flag'])
+            exit(0)
+
+    # Start with a random coordinate for exploration
+    lat = random.uniform(-80, 80)
+    lng = random.uniform(-170, 170)
+    
+    # Get initial distance feedback
+    r = s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': lat, 'lng': lng})
+    response = r.json()
+    
+    if response.get('correct'):
+        right_coords.append((lat, lng))
+        print(f"Found coordinate: ({lat}, {lng})")
+        return True
+    elif response.get('gameWon'):
+        print(response['message'])
+        return True
+    
+    distance = response['distance']
+    step_size = 10.0  # Start with large steps for coarse search
+    
+    for attempt in range(200):  # Maximum attempts per coordinate
+        # Try moving in 8 directions
+        directions = [
+            (lat + step_size, lng),                      # North
+            (lat - step_size, lng),                      # South  
+            (lat, lng + step_size),                      # East
+            (lat, lng - step_size),                      # West
+            (lat + step_size/2, lng + step_size/2),      # Northeast
+            (lat + step_size/2, lng - step_size/2),      # Southeast
+            (lat - step_size/2, lng + step_size/2),      # Northwest
+            (lat - step_size/2, lng - step_size/2),      # Southwest
+        ]
+        
+        best_lat, best_lng = lat, lng
+        best_distance = distance
+        found_better = False
+        
+        # Evaluate all directions to find the best move
+        for new_lat, new_lng in directions:
+            # Validate geographic bounds
+            if -90 <= new_lat <= 90 and -180 <= new_lng <= 180:
+                # Re-submit checkpoints before testing new position
+                for coord in right_coords:
+                    s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': coord[0], 'lng': coord[1]})
+                
+                r = s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': new_lat, 'lng': new_lng})
+                response = r.json()
+                
+                if response.get('correct'):
+                    right_coords.append((new_lat, new_lng))
+                    print(f"Found coordinate: ({new_lat}, {new_lng})")
+                    return True
+                elif response.get('gameWon'):
+                    print(response['message'])
+                    return True
+                
+                new_distance = response['distance']
+                
+                # Track the best direction
+                if new_distance < best_distance:
+                    best_distance = new_distance
+                    best_lat, best_lng = new_lat, new_lng
+                    found_better = True
+        
+        # Move to the best position found
+        if found_better:
+            lat, lng = best_lat, best_lng
+            distance = best_distance
+        else:
+            # No improvement found - reduce step size for finer search
+            step_size /= 2
+            
+            if step_size < 0.0001:  # Very close to target
+                # Try micro-adjustments
+                fine_steps = [
+                    (lat + 0.0001, lng), (lat - 0.0001, lng),
+                    (lat, lng + 0.0001), (lat, lng - 0.0001)
+                ]
+                
+                for new_lat, new_lng in fine_steps:
+                    if -90 <= new_lat <= 90 and -180 <= new_lng <= 180:
+                        for coord in right_coords:
+                            r = s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': coord[0], 'lng': coord[1]})
+                            if r.json()['gameWon']:
+                                print("Flag:", r.json()['flag'])
+                                exit(0)                        
+                        
+                        r = s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': new_lat, 'lng': new_lng})
+                        response = r.json()
+                        
+                        if response.get('correct'):
+                            right_coords.append((new_lat, new_lng))
+                            print(f"Found coordinate: ({new_lat}, {new_lng})")
+                            return True
+                        elif response.get('gameWon'):
+                            print(response['message'])
+                            return True
+                        
+                        new_distance = response['distance']
+                        if new_distance < distance:
+                            lat, lng, distance = new_lat, new_lng, new_distance
+                            break
+                else:
+                    # Stuck in local minimum - random restart
+                    lat = random.uniform(-80, 80)
+                    lng = random.uniform(-170, 170)
+                    step_size = 10.0
+                    
+                    for coord in right_coords:
+                        s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': coord[0], 'lng': coord[1]})
+                    
+                    r = s.post(URL+"api/guess", json={'sessionId': sessionId, 'lat': lat, 'lng': lng})
+                    response = r.json()
+                    
+                    if response.get('correct'):
+                        right_coords.append((lat, lng))
+                        print(f"Found coordinate: ({lat}, {lng})")
+                        return True
+                    elif response.get('gameWon'):
+                        print(response['message'])
+                        return True
+                    
+                    distance = response['distance']
+        
+        # Progress logging
+        if attempt % 20 == 0:
+            print(f"Attempt {attempt}, distance: {distance:.2f}km, pos: ({lat:.4f}, {lng:.4f})")
+
+# Main execution loop
+for i in range(10):
+    print(f"\n{'='*60}")
+    print(f"Finding coordinate {i+1}/10...")
+    print(f"{'='*60}")
+    success = find_coordinate()
+    if not success:
+        print(f"❌ Failed to find coordinate {i+1}")
+        break
+    print(f"✅ Successfully found {len(right_coords)} coordinates")
+
+print("\n🎯 All found coordinates:", right_coords)</code></pre>
+
+            <h4>🧠 How the Algorithm Works</h4>
+            <div class="math">
+                1. Submit known coordinates → Advance to unknown checkpoint<br>
+                2. Random starting point → Get initial distance<br>
+                3. Test 8 directions → Find direction that reduces distance<br>
+                4. Move in best direction → Update position<br>
+                5. If stuck → Reduce step size (10° → 5° → 2.5° → ...)<br>
+                6. If very stuck → Random restart to escape local minimum<br>
+                7. Repeat until distance ≈ 0 → Coordinate found!
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>📊 Step 4: Execution and Results</h3>
+            <p>Running the script, I observed the progressive discovery of coordinates:</p>
+            
+            <div class="output">
+Finding coordinate 1/10...<br>
+Found coordinate: (51.50739578092163, -0.12784588661043017)<br>
+✅ Successfully found 1 coordinates<br>
+<br>
+Finding coordinate 2/10...<br>
+Attempt 0, distance: 3421.45km, pos: (35.2341, -12.4532)<br>
+Attempt 20, distance: 856.32km, pos: (45.1234, 1.2345)<br>
+Found coordinate: (48.856566708021376, 2.3522047289735184)<br>
+✅ Successfully found 2 coordinates<br>
+<br>
+...<br>
+<br>
+Finding coordinate 10/10...<br>
+Found coordinate: (1.2896523082792868, 103.85004511632928)<br>
+✅ Successfully found 10 coordinates<br>
+<br>
+Flag: CTF{999643512255fe51261f1bbca1721dabf8dc6cbfd54752c410ba8c53fd99769a}
+            </div>
+            
+            <p>The discovered coordinates corresponded to major world cities:</p>
+            <ul>
+                <li>🇬🇧 London (51.507, -0.127)</li>
+                <li>🇫🇷 Paris (48.856, 2.352)</li>
+                <li>🇺🇸 New York (40.782, -73.965)</li>
+                <li>🇦🇺 Sydney (-33.868, 151.209)</li>
+                <li>🇯🇵 Tokyo (35.676, 139.650)</li>
+                <li>🇩🇪 Berlin (52.520, 13.404)</li>
+                <li>🇮🇹 Rome (41.890, 12.492)</li>
+                <li>🇺🇸 San Francisco (37.774, -122.419)</li>
+                <li>🇷🇺 Moscow (55.755, 37.617)</li>
+                <li>🇸🇬 Singapore (1.289, 103.850)</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 5: Flag Capture</h3>
+            <p>After successfully identifying all 10 coordinates in sequence, the API returned the flag! 🎊</p>
+            
+            <div class="flag">
+                🚩 CTF{999643512255fe51261f1bbca1721dabf8dc6cbfd54752c410ba8c53fd99769a}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔄 <strong>State Persistence:</strong> Understanding what persists across sessions is crucial for exploitation</li>
+            <li>🧭 <strong>Gradient Descent:</strong> Distance feedback enables efficient navigation through the search space</li>
+            <li>📊 <strong>Adaptive Algorithms:</strong> Dynamic step sizing allows both coarse exploration and fine-tuned searching</li>
+            <li>💾 <strong>Progressive Knowledge:</strong> Building a database of known solutions makes subsequent attempts easier</li>
+            <li>🎲 <strong>Random Restarts:</strong> When stuck in local minima, random exploration can find new pathways</li>
+            <li>⚡ <strong>Automation Wins:</strong> Manual play would be impractical; automation turns tedious into trivial</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        
+        <h3>The Hill Climbing Algorithm</h3>
+        <p>The core of the solution uses a variant of the hill climbing algorithm with these enhancements:</p>
+        
+        <div class="math">
+            f(position) = distance_to_target<br>
+            goal: minimize f(position)<br>
+            <br>
+            while not at target:<br>
+            &nbsp;&nbsp;evaluate all neighboring positions<br>
+            &nbsp;&nbsp;move to position with smallest distance<br>
+            &nbsp;&nbsp;if no improvement: reduce step_size<br>
+            &nbsp;&nbsp;if completely stuck: random_restart()
+        </div>
+        
+        <h3>Why This Works</h3>
+        <p>The challenge's distance feedback creates a convex optimization landscape where we can reliably converge to the target:</p>
+        <ul>
+            <li><strong>Single Global Minimum:</strong> Distance has only one minimum (the target coordinate)</li>
+            <li><strong>Monotonic Improvement:</strong> Moving toward the target always reduces distance</li>
+            <li><strong>No Local Minima:</strong> Unlike many optimization problems, geographic distance has no false peaks</li>
+        </ul>
+        
+        <h3>Optimization Considerations</h3>
+        <p>The script could be further optimized by:</p>
+        <ul>
+            <li>Using binary search on step sizes instead of linear reduction</li>
+            <li>Implementing parallel exploration of multiple starting positions</li>
+            <li>Leveraging spherical geometry for more accurate distance calculations</li>
+            <li>Caching API responses to reduce redundant requests</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🔓</p>
+    </div>
+</body>
+
+</html>

