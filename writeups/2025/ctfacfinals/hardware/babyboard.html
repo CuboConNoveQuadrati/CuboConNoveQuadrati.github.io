@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - baby-board Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .error-output {
+            background-color: #2a1515;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #cc4444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ffaaaa;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .language-mapping {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🔧 Challenge: baby-board</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: hw</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 15</div>
+            <div>👤 Author: UNKNOWN</div>
+            <div>👤 Solver: Mx05/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>"This is just the warmup..."</p>
+        </div>
+
+        <p><strong>📁 Provided Files:</strong></p>
+        <ul>
+            <li>️ Zip: <a href="https:/Gerber_PCB1_2025-11-08.zip">https:/Gerber_PCB1_2025-11-08.zip</a></li>
+        </ul>
+
+        <p><strong>🚩 Flag Format:</strong> CTF{...}</p>
+        <p><strong>📋 Example:</strong> CTF{deadbeef...}</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Exploration</h2>
+        <p>The attachment suggested a PCB-themed warmup. With a Gerber zip provided, this smelled like a straightforward viewer-and-read job: open the board layers and look for a silkscreen/outline text hiding the flag.</p>
+
+        <p>Given it's a warmup, the plan was to load the zip in an online viewer and scan silkscreen text across layers.</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Investigation Process</h2>
+
+        <div class="step">
+            <h3>🗂️ Step 1: Inspect the archive</h3>
+            <p>Quick look at the Gerber set to map layer names and ensure nothing is missing (outline/drill are key for proper rendering).</p>
+            <div class="command"><pre><code># Unzip locally or upload directly to the viewer
+# Expect files like: *.GTL, *.GBL, *.GTS, *.GBS, *.GTO, *.GBO, *.TXT/DRL, *.GKO
+</code></pre></div>
+        </div>
+
+        <div class="step">
+            <h3>🖥️ Step 2: View with an online Gerber viewer</h3>
+            <p>Used PCBWay's Online Gerber Viewer to render all layers and toggle visibility.</p>
+            <div class="command"><pre><code>https://www.pcbway.com/project/OnlineGerberViewer.html</code></pre>
+            <figure>
+                <img src=".assets/baby-board.png" alt="Screenshot of PCBWay viewer with the challenge board">
+                <figcaption style="color:#aaa">Figure: Screenshot of the PCBWay viewer during solving (not part of the original attachments).</figcaption>
+            </figure>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔤 Step 3: Hunt for readable text</h3>
+            <p>Once layers were visible, I scanned for long alphanumeric strings typical of flags. Hardware challenges often embed them near the board title block or as easter eggs on the copper pour keepouts.</p>
+            <div class="output"><pre><code>Observation: The flag text was clearly readable on the silkscreen once the correct layer was enabled.</code></pre></div>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 4: Extract the flag</h3>
+            <p>Zoomed in to confirm bracket style and full contents, then transcribed exactly.</p>
+            <div class="command"><pre><code># Copy the silkscreen string as-is (case and braces)
+# Verify no hidden spaces or OCR mistakes by cross-checking character count.</code></pre></div>
+            <p>This yielded the final flag below.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 Technical Insights</h2>
+        <h3>About the Gerber format</h3>
+        <p>The Gerber format is an open, ASCII, vector format for PCB manufacturing data. Each file describes a fabrication layer (copper, mask, silkscreen), plus drill data for plated/non‑plated holes.</p>
+        <div class="language-mapping">
+            <strong>Common layer mapping:</strong>
+            <ul>
+                <li>GTL / GBL — Top/Bottom Copper</li>
+                <li>GTS / GBS — Top/Bottom Solder Mask</li>
+                <li>GTO / GBO — Top/Bottom Silkscreen (legend)</li>
+                <li>GKO — Board Outline (keepout)</li>
+                <li>DRL / TXT — Drill files</li>
+            </ul>
+        </div>
+        <h3>Challenge design</h3>
+        <ul>
+            <li>Warmup difficulty with a single tool needed (viewer).</li>
+            <li>Flag discoverable without CAD installs.</li>
+            <li>Good introduction to reading silkscreen legends and layer toggling.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>Knowing where flags hide on boards saves time (silkscreen first!).</li>
+            <li>Layer toggles and mirroring matter for bottom-side legends.</li>
+            <li>Online viewers are enough for most CTF PCB inspections.</li>
+            <li>Verify transcription carefully—silkscreen fonts can blur similar glyphs.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🚩 Flag</h2>
+        <div class="flag">CTF{15984f9b3eefa4d52ce13592692469e4e819a4686fd82169f780d2c6dd347f92}</div>
+    </div>
+
+    <div class="container">
+        <h2>🔗 References & Tools</h2>
+        <div class="references">
+            <p><strong>PCBWay Online Gerber Viewer:</strong> <a href="https://www.pcbway.com/project/OnlineGerberViewer.html">https://www.pcbway.com/project/OnlineGerberViewer.html</a></p>
+            <p><strong>Gerber (RS-274X) overview:</strong> <a href="https://en.wikipedia.org/wiki/Gerber_format">https://en.wikipedia.org/wiki/Gerber_format</a></p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by Mx05/CuboConNoveQuadrati | Happy hacking! 🛠️</p>
+    </div>
+</body>
+
+</html>

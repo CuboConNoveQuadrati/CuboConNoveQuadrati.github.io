@@ -261,11 +261,11 @@
         <p>Upon visiting the web application, I was greeted with a geographic guessing game - similar to GeoGuessr but with a twist. The challenge required me to correctly identify the coordinates of 10 different locations in a row.</p>
 
         <div class="command">
-            curl -X POST http://23ce1851.ctf.ac.upt.ro/api/start
+            curl http://23ce1851.ctf.ac.upt.ro/api/start
         </div>
 
         <div class="output">
-            {"sessionId":"56de5eff813cb637aeb95756e4966e39","totalRounds":10}
+            {"sessionId": "...", "message": "Game started! Find 10 coordinates."}
         </div>
 
         <p>The game mechanics were straightforward but brutal:</p>

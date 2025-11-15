@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - full-house-poker Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0d7377;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #14ffec;
+            margin-top: 25px;
+        }
+
+        pre {
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 5px;
+        }
+
+        .description {
+            background-color: #2a2a2a;
+            border-left: 4px solid #0d7377;
+            padding: 10px 20px;
+            margin: 20px 0;
+        }
+
+        .flag {
+            background-color: #1c3b1c;
+            color: #00ff7f;
+            padding: 10px 20px;
+            border-left: 4px solid #00ff7f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #14ffec;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .references a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+            color: #0d7377;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        .command {
+            background-color: #151515;
+            color: #14ffec;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 4px solid #0d7377;
+        }
+
+        .output {
+            background-color: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ddd;
+        }
+
+        .error-output {
+            background-color: #2a1515;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #cc4444;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #ffaaaa;
+        }
+
+        .highlight-section {
+            background-color: #1a1a1a;
+            border-left: 4px solid #14ffec;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        a {
+            color: #14ffec;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .key-point {
+            border-left: 3px solid #ff7e67;
+            padding-left: 15px;
+            margin: 15px 0;
+            background-color: rgba(255, 126, 103, 0.1);
+        }
+
+        .language-mapping {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🃏 Challenge: full-house-poker</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: misc</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 15</div>
+            <div>👤 Author: UNKNOWN</div>
+            <div>👤 Solver: Mx05/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>"Everyone likes poker. This game is simple. Win 30 times in a row and you hit the jackpot!"</p>
+        </div>
+
+        <p><strong>📁 Provided Files:</strong></p>
+        <ul>
+            <li>🗂️ <code>chall.py</code> — server Python code</li>
+        </ul>
+
+        <p><strong>🚩 Goal:</strong> Reach a 30-win streak.</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Exploration</h2>
+        <p>With the server code in hand, the first step was understanding where randomness came from and how hands were compared. The presence of a global RNG and clearly separated <em>deal</em> and <em>compare</em> functions made this feel like a predict-the-RNG challenge rather than complicated poker strategy.</p>
+
+        <div class="key-point">
+            <p>🕵️ <strong>First Observations:</strong></p>
+            <ul>
+                <li>A global RNG object (likely time-seeded at connection).</li>
+                <li>Server exposes functions akin to <code>deal_hands(rng)</code> and <code>compare_hands(a,b)</code>.</li>
+                <li>Win condition tracked as a <code>streak</code> integer in server output.</li>
+            </ul>
+        </div>
+
+        <p>The plan: reuse the server's own logic locally with the same RNG to decide whether to bet or fold each round.</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Investigation Process</h2>
+
+        <div class="step">
+            <h3>📖 Step 1: Read the server code</h3>
+            <p>Inspection showed the RNG is tied to connection time and used consistently for both player and dealer deals. This means that, if we import the server module after connecting, we can reference its <code>GLOBAL_RNG</code> and deterministically simulate outcomes.</p>
+            <div class="highlight-section">
+                <p>Key idea: If we call the same <code>deal_hands(GLOBAL_RNG)</code> and <code>compare_hands</code> the server uses, we can know the result before sending our action.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🧪 Step 2: Build a suggestion engine</h3>
+            <p>I wrote a small helper class that predicts the winner for the next round and chooses <code>b</code> (bet) only when we win; otherwise <code>f</code> (fold). This guarantees no streak resets.</p>
+            <div class="command"><pre><code class="language-python">from pwn import remote
+from chall import compare_hands, deal_hands, GLOBAL_RNG
+
+class Cheeter:
+    def __init__(self, _deal_hands, _compare_hands, rng):
+        self._deal_hands = _deal_hands
+        self._compare_hands = _compare_hands
+        self.rng = rng
+
+    def suggest(self):
+        player, dealer = self._deal_hands(self.rng)
+        return b"b" if self._compare_hands(player, dealer) &gt; 0 else b"f"</code></pre></div>
+        </div>
+
+        <div class="step">
+            <h3>🌐 Step 3: Orchestrate the interaction</h3>
+            <p>The solver connects, loops rounds by sending the predicted action, and watches the printed streak, betting when it's safe. Once near the target, it sends the final bet to claim the win.</p>
+            <div class="command"><pre><code class="language-python">host = "d707329b.ctf.ac.upt.ro"; port = 9605
+io = remote(host, port)
+
+c = Cheeter(deal_hands, compare_hands, GLOBAL_RNG)
+win = False
+res = c.suggest() + b"\n"
+while not win:
+    io.sendafter(b"Action? [b]et / [f]old &gt; ", res)
+    io.recvuntil(b"streak: ")
+    res = c.suggest() + b"\n"
+    win = int(streak := io.recvline().strip()) &gt;= 29 and res == b"b\n"
+    print(f"Current streak: {streak}")
+
+io.sendlineafter(b"> ", b"b\n")
+io.interactive()</code></pre></div>
+            <div class="output"><pre><code>Current streak: 27
+Current streak: 28
+Current streak: 29
+# final bet...
+</code></pre></div>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 4: Win and capture the flag</h3>
+            <p>With deterministic predictions, the streak hits 30 without resets. The service then prints the flag.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 Technical Insights</h2>
+        <ul>
+            <li><strong>Time-seeded RNG pitfalls:</strong> Seeding at connection time is predictable if the same RNG instance is reused for all draws.</li>
+            <li><strong>Code reuse advantage:</strong> Importing and calling the exact <code>deal_hands</code>/<code>compare_hands</code> avoids re-implementing poker logic and eliminates off-by-one RNG pulls.</li>
+            <li><strong>I/O synchronization:</strong> Use blocking reads like <code>sendafter</code>/<code>recvuntil</code> to align predictions with the server's next RNG calls.</li>
+        </ul>
+        <div class="error-output"><pre><code>Gotcha: Any extra read/write (like a stray recvline) can desynchronize your RNG state from the server and break predictions.</code></pre></div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>Predictable RNG makes "skill" irrelevant—match the server's state and you can't lose.</li>
+            <li>Reusing server functions ensures identical game rules and ordering.</li>
+            <li>Keep network I/O minimal and deterministic to avoid RNG drift.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🚩 Flag</h2>
+        <div class="flag">CTF{59a4f53815bce9b2ce22ed1124e985191255482c3d97f1f84e01211f757ac916}</div>
+    </div>
+
+    <div class="container">
+        <h2>🔗 References & Tools</h2>
+        <div class="references">
+            <p><strong>pwntools:</strong> <a href="https://docs.pwntools.com/">https://docs.pwntools.com/</a></p>
+            <p><strong>Python random (RNG basics):</strong> <a href="https://docs.python.org/3/library/random.html">https://docs.python.org/3/library/random.html</a></p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by Mx05/CuboConNoveQuadrati | Happy hacking! 🃏</p>
+    </div>
+</body>
+
+</html>

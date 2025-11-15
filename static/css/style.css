@@ -1,0 +1,653 @@
+body,
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  transition: 0.3s;
+}
+
+body {
+  background-color: rgb(21, 30, 40);
+  margin: 0;
+  background-image: url("../imgs/Logo RDC.png");
+  background-size: 30%;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  padding: 10px;
+  padding-top: 2%;
+  color: white;
+  font-family: "PT Mono", monospace;
+}
+
+#blur_container {
+  position: absolute;
+  width: 80%;
+  background-color: rgb(50 70 100 / 60%);
+  backdrop-filter: blur(30px);
+  z-index: 0;
+  left: 10%;
+  padding: 10px;
+  border-radius: 20px;
+  /* align-items: center; */
+  /* width: 100%; */
+}
+
+#title {
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+  color: unset;
+}
+
+.link {
+  margin-left: 10px;
+  margin-right: 10px;
+  color: #fff !important;
+}
+
+.nav.link {
+  display: inline-flex;
+  flex-wrap: nowrap;
+}
+
+.navbar_links {
+  display: inline-flexbox;
+  justify-content: justify;
+}
+
+/* Forza il titolo nella navbar ad essere bianco */
+#navbar > b:first-child > a,
+#navbar > b:first-child > a > b,
+nav > b:first-child > a,
+nav > b:first-child > a > b,
+.titleee > a,
+.titleee > a > b,
+#navbar a:first-child,
+#navbar b:first-child a {
+  color: #fff !important;
+}
+
+/* Mantieni le parentesi quadre in orangered */
+#navbar > b:first-child > a > b[style*="orangered"],
+nav > b:first-child > a > b[style*="orangered"],
+.titleee > a > b[style*="orangered"] {
+  color: orangered !important;
+}
+
+.nav.link.active {
+  border-bottom: 1px solid rgb(255, 255, 255, 0.7);
+}
+
+.link.nav i {
+  margin-right: 10px;
+}
+
+.link:hover {
+  color: rgb(255, 255, 255, 0.7) !important;
+}
+
+.division_line {
+  border: none;
+  /* border-top: solid 2px rgb(255, 255, 255, 0.5); */
+  width: 30%;
+}
+
+#social {
+  text-align: center;
+}
+
+#about {
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  text-align: justify;
+  width: 70%;
+}
+
+.content_title {
+  font-size: large;
+}
+
+.img-container {
+  display: inline-block;
+  margin: 10px;
+  width: 100px;
+  font-size: small;
+  position: relative;
+}
+
+.img-container img {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.img-container .hidden-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  color: white;
+  text-align: center;
+  padding: 0px;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 20px;
+  font-size: 80%;
+}
+
+.img-container:hover img {
+  opacity: 0.5;
+}
+
+.img-container:hover .hidden-text {
+  opacity: 1;
+}
+
+#news {
+  display: grid;
+  place-items: center;
+}
+
+#posts {
+  display: grid;
+  place-items: center;
+}
+
+.news_article {
+  margin-bottom: 20px;
+  display: block;
+  border: 1px solid rgb(21, 30, 40);
+  padding: 20px;
+  border-radius: 20px;
+  text-align: justify;
+  width: 60%;
+  backdrop-filter: blur();
+  box-shadow: 0 0 10px 1px rgb(21, 30, 40);
+  overflow: hidden;
+  background-color: rgb(41, 49, 51, 0.5);
+}
+
+.news_article:hover {
+  background-color: rgb(41, 49, 51, 0.3);
+  cursor: pointer;
+}
+
+.news_description {
+  color: rgb(255, 255, 255, 0.7);
+}
+
+.news_date {
+  color: rgb(255, 255, 255, 0.9);
+}
+
+.news_footer {
+  font-size: 70%;
+}
+
+#writeups{
+  display: grid;
+  place-items: center;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 300px);
+  width: 100%;
+}
+
+#events{
+  display: grid;
+  place-items: center;
+  overflow-x: auto;
+}
+
+::-webkit-scrollbar {
+  width: 13px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #232e33;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+  transition: 0.3s;
+  background-color: #b8d9ff;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  transition: 0.3s;
+  background-color: #8ca6c4;
+}
+
+@media screen and (max-width: 375px) {
+  .navbar_links {
+    margin-top: 10px;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 475px) {
+  .content {
+    font-size: small;
+    width: 90%;
+  }
+
+  .content_title {
+    font-size: medium;
+  }
+
+  .news_article {
+    width: 80%;
+  }
+
+  .tree-nav__item-title{
+    font-size: 100%;
+  }
+
+  .news_article{
+    font-size: 70%;
+  }
+}
+
+summary {
+  display: block;
+  cursor: pointer;
+  outline: 0;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+.tree-nav {
+  width: max-content;
+  max-width: 90%;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.tree-nav__item {
+  display: block;
+  white-space: nowrap;
+  color: #ccc;
+  position: relative;
+  contain: layout;
+}
+
+.tree-nav__item.is-expandable::before {
+  /* border-left: 1px dashed #ffffff; */
+  content: "";
+  left: 0.8rem;
+  position: absolute;
+  top: 2.4rem;
+  height: calc(100% - 2.4rem);
+  width: 1px;
+}
+
+.tree-nav__item .tree-nav__item {
+  margin-left: 2.4rem;
+}
+
+.tree-nav__item.is-expandable[open]>.tree-nav__item-title::before {
+  font-family: "Font Awesome 6 Free";
+  transform: rotate(90deg);
+}
+
+.tree-nav__item.is-expandable>.tree-nav__item-title {
+  padding-left: 2.4rem;
+}
+
+.tree-nav__item.is-expandable>.tree-nav__item-title::before {
+  position: absolute;
+  will-change: transform;
+  transition: transform 300ms ease;
+  font-family: "Font Awesome 6 Free";
+  color: #fff;
+  font-size: 1.1rem;
+  content: "⮞";
+  left: 0;
+  display: inline-block;
+  width: 1.6rem;
+  text-align: center;
+}
+
+.tree-nav__item-title {
+  font-weight: bold;
+  cursor: pointer;
+  display: block;
+  outline: 0;
+  color: #fff;
+  font-size: 125%;
+  line-height: 3.2rem;
+  /* background-color: rgb(255, 255, 255, 0.3); */
+  border-radius: 10px 50px 50px 10px;
+  width: max-content;
+  padding: 20px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  margin: 2px;
+}
+
+.tree-nav__item-title:hover{
+  background-color: rgb(255, 255, 255, 0.5);
+}
+
+.tree-nav__item-title::-webkit-details-marker {
+  display: none;
+}
+
+
+
+/******************* MEMBERS CARDS **************/
+
+#members{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+#members h2 {
+  width: 70%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#members .members-container {
+  width: 70%;
+  display: grid;
+  grid-template-columns: repeat(5, 200px);
+  gap: 20px;
+  justify-content: start;
+}
+
+.members {
+    /* height: 100vh; */
+    width: 100vw;
+
+    max-height: 800px;
+    max-width: 1212px;
+    min-height: 250px;
+    /* min-width: 1000px; */
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto;
+
+
+}
+
+.border {
+    /* height: 242px; */
+    height: 190px;
+    width: 190px;
+    background: transparent;
+    border-radius: 10px;
+    transition: border 1s;
+    position: relative;
+
+}
+.border:hover{
+    border: 1px solid white;
+}
+
+.card{
+  /* height: 252px; */
+  height: 200px;
+  width: 200px;
+  background: grey;
+  border-radius: 20px;
+  transition: background 0.8s;
+  overflow: hidden;
+  background: black;
+  box-shadow: 0 70px 63px -60px #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.card:hover h2{
+    opacity: 1;
+}
+.card:hover .fa{
+    opacity: 1;
+}
+
+
+.members h2{
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: white;
+  margin: 20px;
+  opacity: 0;
+  transition: opacity 1s;
+  text-align: center;
+}
+
+.border h2 {
+  text-align: center;
+}
+.members .fa{
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.icons{
+  position: absolute;
+  fill: #fff;
+  color: #fff;
+  height: 130px;
+  top: 50px;
+  width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+/******************* WRITEUP PAGE **************/
+
+#writeup-container {
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+#writeup-header {
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+#writeup-title {
+  font-size: 2.5em;
+  margin: 20px 0;
+  color: #fff;
+  text-align: center;
+}
+
+#writeup-meta {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  color: rgb(255, 255, 255, 0.7);
+  font-size: 0.9em;
+}
+
+#writeup-meta span {
+  padding: 5px 15px;
+  background-color: rgb(41, 49, 51, 0.5);
+  border-radius: 15px;
+  border: 1px solid rgb(21, 30, 40);
+}
+
+#writeup-content {
+  width: 100%;
+  max-width: 800px;
+  padding: 30px;
+  border: 1px solid rgb(21, 30, 40);
+  border-radius: 20px;
+  background-color: rgb(41, 49, 51, 0.5);
+  box-shadow: 0 0 10px 1px rgb(21, 30, 40);
+  text-align: justify;
+  line-height: 1.6;
+  color: #fff;
+}
+
+#writeup-content h1,
+#writeup-content h2,
+#writeup-content h3 {
+  color: #fff;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+#writeup-content h1 {
+  font-size: 2em;
+  border-bottom: 2px solid rgb(255, 255, 255, 0.3);
+  padding-bottom: 10px;
+}
+
+#writeup-content h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid rgb(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+#writeup-content h3 {
+  font-size: 1.2em;
+}
+
+#writeup-content p {
+  margin: 15px 0;
+  color: rgb(255, 255, 255, 0.9);
+}
+
+#writeup-content code {
+  background-color: rgb(21, 30, 40);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #fff !important;
+  font-size: 0.9em;
+}
+
+#writeup-content pre {
+  background-color: rgb(21, 30, 40);
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 20px 0;
+  border: 1px solid rgb(41, 49, 51);
+}
+
+#writeup-content pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #fff !important;
+  font-size: 0.85em;
+}
+
+#writeup-content ul,
+#writeup-content ol {
+  margin: 15px 0;
+  padding-left: 30px;
+}
+
+#writeup-content li {
+  margin: 8px 0;
+  color: rgb(255, 255, 255, 0.9);
+}
+
+#writeup-content a,
+#writeup-content a.link,
+#writeup-content a:link,
+#writeup-content a:visited,
+#writeup-content a:active,
+#writeup-content a:focus,
+#writeup-content * a,
+#writeup-content * a.link,
+#writeup-content * a:link,
+#writeup-content * a:visited {
+  color: #fff !important;
+  text-decoration: underline;
+}
+
+#writeup-content a:hover,
+#writeup-content a.link:hover,
+#writeup-content * a:hover {
+  color: rgb(255, 255, 255, 0.7) !important;
+}
+
+/* Sovrascrivi qualsiasi stile inline nei writeup */
+#writeup-content style {
+  display: none;
+}
+
+/* Forza tutti gli elementi con stili inline */
+#writeup-content [style*="color"] a,
+#writeup-content [style*="color:"] a {
+  color: #fff !important;
+}
+
+#writeup-content button,
+#writeup-content input[type="button"],
+#writeup-content input[type="submit"],
+button,
+input[type="button"],
+input[type="submit"] {
+  color: #fff !important;
+  background-color: rgb(41, 49, 51, 0.5);
+  border: 1px solid rgb(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#writeup-content button:hover,
+#writeup-content input[type="button"]:hover,
+#writeup-content input[type="submit"]:hover,
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover {
+  background-color: rgb(41, 49, 51, 0.7);
+  border-color: rgb(255, 255, 255, 0.5);
+  color: #fff !important;
+}
+
+#writeup-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin: 20px 0;
+  box-shadow: 0 0 10px 1px rgb(21, 30, 40);
+}
+
+@media screen and (max-width: 475px) {
+  #writeup-title {
+    font-size: 1.8em;
+  }
+
+  #writeup-content {
+    padding: 20px;
+    font-size: 0.9em;
+  }
+
+  #writeup-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

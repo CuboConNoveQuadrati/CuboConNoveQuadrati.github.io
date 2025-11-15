@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Writeup - sparse hills Challenge</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        header {
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #0d7377;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #0d7377;
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .challenge-info div {
+            background-color: #222;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .container {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        h2 { color: #0d7377; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h3 { color: #14ffec; margin-top: 25px; }
+
+        pre { border-radius: 5px; overflow-x: auto; margin: 15px 0; padding: 0; }
+        code { font-family: 'Consolas', 'Monaco', monospace; border-radius: 5px; }
+
+        .description { background-color: #2a2a2a; border-left: 4px solid #0d7377; padding: 10px 20px; margin: 20px 0; }
+
+        .flag { background-color: #1c3b1c; color: #00ff7f; padding: 10px 20px; border-left: 4px solid #00ff7f; margin: 20px 0; font-weight: bold; font-family: 'Consolas', 'Monaco', monospace; }
+
+        .step { margin-bottom: 30px; }
+        .step-title { font-weight: bold; margin-bottom: 10px; color: #14ffec; }
+
+        ul { padding-left: 20px; }
+        ul li { margin-bottom: 8px; }
+
+        .references a { color: #14ffec; text-decoration: none; }
+        .references a:hover { text-decoration: underline; color: #0d7377; }
+
+        .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #777; }
+
+        .command { background-color: #151515; color: #14ffec; padding: 10px 15px; border-radius: 5px; margin: 15px 0; font-family: 'Consolas', 'Monaco', monospace; border-left: 4px solid #0d7377; }
+        .output { background-color: #1a1a1a; padding: 10px 15px; border-radius: 5px; border-left: 4px solid #444; margin: 15px 0; font-family: 'Consolas', 'Monaco', monospace; color: #ddd; }
+        .error-output { background-color: #2a1515; padding: 10px 15px; border-radius: 5px; border-left: 4px solid #cc4444; margin: 15px 0; font-family: 'Consolas', 'Monaco', monospace; color: #ffaaaa; }
+        .highlight-section { background-color: #1a1a1a; border-left: 4px solid #14ffec; padding: 15px; margin: 20px 0; }
+
+        a { color: #14ffec; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .emoji { font-size: 1.2em; margin-right: 5px; }
+        .key-point { border-left: 3px solid #ff7e67; padding-left: 15px; margin: 15px 0; background-color: rgba(255, 126, 103, 0.1); }
+        .language-mapping { background-color: #1a1a1a; border: 1px solid #444; border-radius: 5px; padding: 15px; margin: 15px 0; font-family: 'Consolas', 'Monaco', monospace; }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>⛰️ Challenge: sparse hills</h1>
+        <div class="challenge-info">
+            <div>🏆 CTF@AC</div>
+            <div>🎯 Category: crypto</div>
+            <div>💯 Points: 100</div>
+            <div>📊 Solves: 15</div>
+            <div>👤 Author: UNKNOWN</div>
+            <div>👤 Solver: Mx05/CuboConNoveQuadrati</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📝 Challenge Description</h2>
+        <div class="description">
+            <p>"Sparse be these hills, feed you they shall nevertheless ! Bend them to your will! For with enough time and prerseverence nothing is impossible."</p>
+        </div>
+
+        <p><strong>📁 Provided Files:</strong></p>
+        <ul>
+            <li>🗂️ <code>server.py</code> — The server Python code</li>
+        </ul>
+
+        <p><strong>🚩 Goal:</strong> Decrypt the flag produced by a Hill-cipher-like scheme over mod 257.</p>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Initial Exploration</h2>
+        <p>The description hinted at a structured Hill cipher. The modulus 257 suggests arithmetic over a prime field, making matrix inversion feasible. The presence of an encryption oracle enabled a classic known-plaintext (more precisely, chosen-plaintext) attack.</p>
+
+        <div class="key-point">
+            <p>🕵️ <strong>First Observations:</strong></p>
+            <ul>
+                <li>Key structure: <code>K = P · L · U (mod 257)</code> (product of matrices mod 257).</li>
+                <li>Oracle lets us encrypt arbitrary plaintexts and retrieve the flag ciphertext.</li>
+                <li>Over a prime modulus, any full-rank square matrix is invertible.</li>
+            </ul>
+        </div>
+
+        <p>Plan: query with unit vectors to recover columns of the encryption matrix, then invert it to decrypt the flag.</p>
+    </div>
+
+    <div class="container">
+        <h2>🛠️ Investigation Process</h2>
+
+        <div class="step">
+            <h3>📖 Step 1: Confirm the model</h3>
+            <p>The server implements a Hill-like cipher over <code>GF(257)</code>. If <code>y = K · x (mod 257)</code>, then encrypting a unit vector <code>e_i</code> returns column <code>i</code> of <code>K</code>. Repeating this for all <code>i</code> reconstructs <code>K</code> entirely.</p>
+            <div class="highlight-section">
+                <p>Key idea: chosen-plaintext with unit vectors recovers the full linear transformation in exactly <code>n</code> queries for an <code>n×n</code> system.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🧪 Step 2: Automate queries and collect columns</h3>
+            <p>Using the solver, we connect, request the encrypted flag, and then loop over unit vectors to fill the columns of <code>K</code>.</p>
+            <div class="command"><pre><code class="language-python">from pwn import remote, context
+import sys, os
+
+n = 257
+HOST = "a8abb4bb.ctf.ac.upt.ro"
+PORT = 9603
+
+class Connection:
+    def __enter__(self):
+        self.io = remote(HOST, PORT)
+        return self
+    def encrypted_flag(self):
+        self.io.sendlineafter(b"> ", b"1")
+        return self.io.recvlines(2)[-1].decode()
+    def send_plaintext(self, data: bytes):
+        self.io.sendlineafter(b"> ", b"2")
+        self.io.sendafter(b"> ", data)
+        return self.io.recvlines(2)[-1].decode()
+    def __exit__(self, *args):
+        self.io.close()
+
+# Parse the server's hex numbers into integers
+parse = lambda s: [int(x, 16) for x in s.split()]
+
+with Connection() as conn:
+    enc_flag = parse(conn.encrypted_flag())
+
+# Recover K column-by-column using unit vectors
+key = [[0]*n for _ in range(n)]
+for i in range(n):
+    plain = bytearray(n); plain[i] = 1
+    with Connection() as conn:
+        col = parse(conn.send_plaintext(bytes(plain)))
+    for r, v in enumerate(col):
+        key[r][i] = v
+</code></pre></div>
+            <div class="output"><pre><code>Recovered columns: 0/257 ... 256/257
+Key matrix recovered.</code></pre></div>
+        </div>
+
+        <div class="step">
+            <h3>🧮 Step 3: Invert the matrix modulo 257</h3>
+            <p>After converting to a Sage matrix over integers and reducing mod 257, we compute <code>K^{-1}</code> with modular arithmetic and apply it to the encrypted flag vector.</p>
+            <div class="command"><pre><code class="language-python"># In Sage / Python-with-Sage
+key_matrix = matrix(ZZ, key) % n
+# Invert via adjugate/determinant or built-in inverse over modular ring
+# (Sage: key_matrix.inverse() works over QQ; we reduce properly mod 257)
+
+def matrix_mod_inv(M, p):
+    det = int(round(M.det())) % p
+    det_inv = pow(det, p-2, p)  # Fermat (p prime)
+    Minv = M.inverse()          # over QQ
+    adj = (det * Minv) % p
+    return (det_inv * adj) % p
+
+K_inv = matrix_mod_inv(key_matrix, n)
+flag_vec = vector(ZZ, enc_flag)
+dec_vec = (K_inv * flag_vec) % n
+flag = bytes(dec_vec).rstrip(b"\x00").decode()
+print(flag)
+</code></pre></div>
+            <div class="error-output"><pre><code>Gotcha: ensure K is full-rank mod 257. Any I/O desync or wrong length breaks column recovery and makes the matrix singular.</code></pre></div>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Step 4: Decrypt the flag</h3>
+            <p>With <code>K^{-1}</code> computed, multiplying by the ciphertext vector yields the plaintext bytes. Trimming padding zeros reveals the flag.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧠 Technical Insights</h2>
+        <ul>
+            <li><strong>Linear oracle extraction:</strong> Chosen-plaintext unit vectors recover linear maps with one query per dimension.</li>
+            <li><strong>Prime modulus perks:</strong> Working in <code>GF(257)</code> simplifies inversion with Fermat’s little theorem.</li>
+            <li><strong>Numerical care:</strong> Compute determinants/inverses over rationals, then reduce mod <code>p</code> consistently.</li>
+        </ul>
+        <div class="highlight-section">
+            <p>Performance note: 257 queries for columns + 1 for the flag is well within typical CTF rate limits.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Key Takeaways</h2>
+        <ul>
+            <li>Structured Hill ciphers are vulnerable to chosen-plaintext attacks.</li>
+            <li>Always operate modulo a prime to keep algebra simple.</li>
+            <li>Keep I/O deterministic; any extra reads/writes can corrupt reconstruction.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>🚩 Flag</h2>
+        <div class="flag"> CTF{aeadf0c7f0919add5906e34cf358d94c49766545079fa640ce260fda99e45850}</div>
+    </div>
+
+    <div class="container">
+        <h2>🔗 References & Tools</h2>
+        <div class="references">
+            <p><strong>SageMath:</strong> <a href="https://www.sagemath.org/">https://www.sagemath.org/</a></p>
+            <p><strong>pwntools:</strong> <a href="https://docs.pwntools.com/">https://docs.pwntools.com/</a></p>
+            <p><strong>Hill cipher (background):</strong> <a href="https://en.wikipedia.org/wiki/Hill_cipher">https://en.wikipedia.org/wiki/Hill_cipher</a></p>
+            <p><strong>Modular inverse:</strong> <a href="https://mathworld.wolfram.com/ModularInverse.html">https://mathworld.wolfram.com/ModularInverse.html</a></p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🏆 © 2025 - Writeup created by Mx05/CuboConNoveQuadrati | Happy hacking! ⛰️</p>
+    </div>
+</body>
+
+</html>

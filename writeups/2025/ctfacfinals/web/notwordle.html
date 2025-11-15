@@ -266,7 +266,7 @@
             <div>🌐 Category: Web</div>
             <div>💯 Points: 100</div>
             <div>📊 Solves: 15</div>
-            <div>👤 Author: Unknown</div>
+            <div>👤 Author: 0v3rCl0kEd</div>
             <div>👤 Solver: IRVANNI/CuboConNoveQuadrati</div>
         </div>
     </header>
@@ -316,17 +316,10 @@
             <p>Looking at the code, I noticed a special mode called <code>wotd</code> (Word of the Day). When the <code>mode</code> cookie is set to <code>wotd</code>, something interesting happens:</p>
 
             <pre><code class="language-javascript">// Pseudo-code from source analysis
-function getSecret(mode, cookies) {
-    const m = (mode || cookies.mode || 'random').toLowerCase();
-    if (m === 'wotd') {
-        const flag = (process.env.FLAG || 'REAL_FLAG_ON_REMOTE').toLowerCase();
-        return { mode: 'wotd', secret: flag };
-    }
-    let secret = cookies.randomSecret;
-    if (!secret || !/^[a-z]{5}$/.test(secret)) {
-        secret = pickRandomWord();
-    }
-    return { mode: 'random', secret };
+if (cookies.mode === 'wotd') {
+    secret = FLAG;  // The secret word becomes the flag!
+} else {
+    secret = randomWord;
 }</code></pre>
 
             <div class="key-point">
@@ -514,29 +507,33 @@ Final flag: CTF{394598e191e14a86520b95668a437e43a5508c709ba500d02679f5fa4d04a61d
             <li><strong>No Rate Limiting:</strong> Unlimited guesses enable exhaustive searching</li>
             <li><strong>Special Admin Mode:</strong> The <code>wotd</code> mode uses the flag as the secret without proper authorization</li>
         </ol>
+
     </div>
 
     <div class="container">
-        <h2>🎮 The Wordle Connection</h2>
-        <p>The challenge cleverly subverts the Wordle game mechanics:</p>
+        <h2>🔍 Alternative Approaches</h2>
+        <p>Other ways to solve this challenge:</p>
         
-        <div class="highlight-section">
-            <p><strong>Legitimate Wordle:</strong> Players have 6 attempts to guess a 5-letter word. Feedback helps narrow down possibilities but doesn't leak the exact word character by character.</p>
-            
-            <p><strong>not-wordle Vulnerability:</strong> Unlimited attempts + character-specific feedback = complete secret extraction. The game mechanics become an exploitation primitive!</p>
-        </div>
+        <h3>1. Dictionary Attack with Monitoring</h3>
+        <pre><code class="language-python"># Try common CTF flag patterns
+patterns = [
+    "CTF{[0-9a-f]{64}}",  # SHA256 hash
+    "CTF{[0-9a-f]{32}}",  # MD5 hash
+    # ... etc
+]
+# Monitor which characters get "correct" status</code></pre>
 
-        <h3>Why "Definitely Not Wordle"?</h3>
-        <p>The challenge description is tongue-in-cheek:</p>
-        <ul>
-            <li>✅ It looks like Wordle</li>
-            <li>✅ It behaves like Wordle</li>
-            <li>❌ But it has critical security flaws</li>
-            <li>❌ The "word" is actually a 64-character flag</li>
-            <li>❌ You can manipulate it to reveal secrets</li>
-        </ul>
+        <h3>2. Binary Search Optimization</h3>
+        <pre><code class="language-python"># For very long secrets, binary search can be faster
+# Test if character < 'm', then < 'g', etc.
+# Reduces search space logarithmically</code></pre>
 
-        <p>It's "definitely not Wordle" because real Wordle doesn't have these vulnerabilities! 😄</p>
+        <h3>3. Parallel Requests</h3>
+        <pre><code class="language-python"># Test multiple characters simultaneously
+# Use threading to speed up extraction
+import concurrent.futures</code></pre>
+
+        <p>However, the simple sequential approach is sufficient and most reliable for this challenge.</p>
     </div>
 
     <div class="container">
